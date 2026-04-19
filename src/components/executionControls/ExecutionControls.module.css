@@ -1,0 +1,90 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.btn {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  transition: opacity 0.15s, transform 0.1s;
+  flex: 1;
+}
+
+.btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.runBtn {
+  background: var(--color-accept);
+  color: #fff;
+  flex: 2;
+}
+
+.stepBtn {
+  background: var(--color-running);
+  color: #fff;
+  flex: 2;
+}
+
+.resetBtn {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+
+.stepInfo {
+  font-size: 11px;
+  color: var(--color-running);
+  text-align: center;
+  padding: 4px;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.errorList {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid var(--color-reject);
+  border-radius: 4px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.errorItem {
+  color: var(--color-reject);
+  font-size: 11px;
+}

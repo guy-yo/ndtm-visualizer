@@ -1,0 +1,59 @@
+.tape {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.tape::-webkit-scrollbar {
+  height: 3px;
+}
+
+.tape::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+.cell {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.blank {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.head {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  position: relative;
+}
+
+.head::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--color-accent);
+}
