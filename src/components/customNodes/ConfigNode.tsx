@@ -13,13 +13,13 @@ export const nodeTypes = { configNode: ConfigNode };
 export function ConfigNode({ data }: NodeProps<ConfigNodeType>) {
   const toggleCollapse = useAppStore((s) => s.toggleCollapse);
   const blankSymbol = useAppStore((s) => s.machine.blankSymbol);
-  const { state, tape, headPosition, status, isOnAcceptPath, isCollapsed, hasChildren, depth } = data;
+  const { state, tape, headPosition, status, isOnAcceptPath, isCollapsed, hasChildren, depth, isLoopStart } = data;
 
   const borderClass = styles[status];
 
   return (
     <div
-      className={`${styles.node} ${borderClass} ${isOnAcceptPath ? styles.acceptPath : ''}`}
+      className={`${styles.node} ${borderClass} ${isOnAcceptPath ? styles.acceptPath : ''} ${isLoopStart ? styles.loopStart : ''}`}
       onClick={() => hasChildren && toggleCollapse(data.configId)}
       title={hasChildren ? (isCollapsed ? 'Click to expand' : 'Click to collapse') : undefined}
       style={{ cursor: hasChildren ? 'pointer' : 'default' }}

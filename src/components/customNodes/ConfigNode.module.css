@@ -32,6 +32,13 @@
   opacity: 0.8;
 }
 
+/* Node that is the START of a loop (an ancestor repeated by a loop leaf) */
+.loopStart {
+  border-color: #f59e0b !important;
+  border-style: dashed !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
 /* Accept path highlight */
 .acceptPath {
   box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);

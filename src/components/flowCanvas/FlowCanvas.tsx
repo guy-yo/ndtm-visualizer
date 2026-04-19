@@ -77,10 +77,11 @@ export function FlowCanvas() {
         <MiniMap
           nodeColor={(node) => {
             const status = (node.data as { status: NodeStatus })?.status;
-            return STATUS_COLORS[status] ?? '#475569';
+            return STATUS_COLORS[status] ?? '#94a3b8';
           }}
-          style={{ background: '#1e293b', border: '1px solid #334155' }}
-          maskColor="rgba(15, 23, 42, 0.7)"
+          nodeStrokeWidth={0}
+          style={{ background: '#0f172a', border: '1px solid #475569' }}
+          maskColor="rgba(0, 0, 0, 0.25)"
         />
       </ReactFlow>
     </div>

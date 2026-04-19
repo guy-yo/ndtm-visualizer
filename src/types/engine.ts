@@ -19,6 +19,8 @@ export interface NTMConfig {
   transitionUsed: string | null;
   status: NodeStatus;
   children: string[];
+  /** ID of the ancestor node whose fingerprint matches this loop node. Null unless status === 'loop'. */
+  loopOriginId: string | null;
 }
 
 export interface TreeStats {

@@ -17,25 +17,29 @@ export function fingerprint(
 }
 
 /**
- * Returns true if this configuration has been seen on the current branch.
- * `ancestorFingerprints` is the set carried forward from the parent.
+ * `ancestorFingerprints` maps each fingerprint to how many times it has
+ * appeared in the current branch's ancestor chain.
+ *
+ * Returns true when the count reaches 2, meaning the branch has already
+ * completed one full repeat (the second repeat is now being attempted).
+ * This lets ONE visible "extra" iteration appear in the tree before cutting off.
  */
 export function isLoop(
   fp: string,
-  ancestorFingerprints: ReadonlySet<string>
+  ancestorFingerprints: ReadonlyMap<string, number>
 ): boolean {
-  return ancestorFingerprints.has(fp);
+  return (ancestorFingerprints.get(fp) ?? 0) >= 2;
 }
 
 /**
- * Creates a new Set with `fp` added (immutable extension).
+ * Returns a new Map with the count for `fp` incremented by 1.
  * Each branch gets its own copy so sibling branches don't interfere.
  */
 export function extendFingerprints(
-  ancestorFingerprints: ReadonlySet<string>,
+  ancestorFingerprints: ReadonlyMap<string, number>,
   fp: string
-): Set<string> {
-  const next = new Set(ancestorFingerprints);
-  next.add(fp);
+): Map<string, number> {
+  const next = new Map(ancestorFingerprints);
+  next.set(fp, (next.get(fp) ?? 0) + 1);
   return next;
 }

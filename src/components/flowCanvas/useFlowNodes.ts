@@ -50,6 +50,15 @@ export function useFlowNodes(
     const visibleIds = collectVisible(tree, collapsedIds);
     const transitionMap = new Map<string, Transition>(allTransitions.map((t) => [t.id, t]));
 
+    // Collect loop-start node IDs: any node referenced as loopOriginId by a LOOP leaf
+    const loopStartIds = new Set<string>();
+    for (const id of visibleIds) {
+      const config = tree.nodes.get(id);
+      if (config?.status === 'loop' && config.loopOriginId && visibleIds.has(config.loopOriginId)) {
+        loopStartIds.add(config.loopOriginId);
+      }
+    }
+
     const rawNodes: Node<ConfigNodeData>[] = [];
     const rawEdges: Edge<TransitionEdgeData>[] = [];
 
@@ -75,10 +84,13 @@ export function useFlowNodes(
           isCollapsed,
           depth: config.depth,
           hasChildren,
+          isLoopStart: loopStartIds.has(id),
+          loopOriginId: config.loopOriginId,
         },
         draggable: false,
       });
 
+      // Tree edge (parent → child)
       if (config.parentId && visibleIds.has(config.parentId)) {
         const t = config.transitionUsed ? transitionMap.get(config.transitionUsed) : null;
         const label = t ? formatTransitionLabel(t) : '';
@@ -109,7 +121,31 @@ export function useFlowNodes(
       }
     }
 
+    // Run dagre layout on tree edges only
     const { nodes, edges } = getLayoutedElements(rawNodes, rawEdges, 'TB');
-    return { nodes, edges };
+
+    // Add loop back-edges after layout (decorative — not part of dagre graph)
+    const backEdges: Edge<TransitionEdgeData>[] = [];
+    for (const id of visibleIds) {
+      const config = tree.nodes.get(id);
+      if (!config || config.status !== 'loop' || !config.loopOriginId) continue;
+      if (!visibleIds.has(config.loopOriginId)) continue;
+
+      backEdges.push({
+        id: `loop-back-${id}`,
+        source: id,
+        target: config.loopOriginId,
+        type: 'default',
+        animated: true,
+        style: { stroke: '#f59e0b', strokeWidth: 2, strokeDasharray: '6,3' },
+        label: '↩ loops back',
+        labelShowBg: true,
+        labelBgStyle: { fill: '#1e293b', fillOpacity: 0.95 },
+        labelStyle: { fill: '#f59e0b', fontSize: 9, fontWeight: 700 },
+        data: { transitionId: null, fromState: '', readSymbol: '', writeSymbol: '', move: '', label: '↩ loops back' },
+      });
+    }
+
+    return { nodes, edges: [...edges, ...backEdges] };
   }, [tree, collapsedIds, highlightAcceptPath, allTransitions]);
 }

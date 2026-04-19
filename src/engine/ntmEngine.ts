@@ -9,7 +9,8 @@ import { fingerprint, isLoop, extendFingerprints } from './loopDetector';
 
 export interface BFSQueueEntry {
   configId: string;
-  ancestorFingerprints: ReadonlySet<string>;
+  /** Maps fingerprint → number of ancestors in this branch that had that fingerprint. */
+  ancestorFingerprints: ReadonlyMap<string, number>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -23,6 +24,35 @@ function buildAcceptPath(nodes: Map<string, NTMConfig>, leafId: string): string[
     current = node?.parentId ?? null;
   }
   return path;
+}
+
+/**
+ * Walk up the parent chain to find the first ancestor whose fingerprint
+ * matches `fp`. Returns that ancestor's ID, or null if not found.
+ */
+function findLoopOriginId(
+  nodeId: string,
+  fp: string,
+  nodes: Map<string, NTMConfig>,
+  machine: NTMDefinition,
+  settings: ExecutionSettings,
+): string | null {
+  const node = nodes.get(nodeId);
+  let checkId = node?.parentId ?? null;
+  while (checkId !== null) {
+    const ancestor = nodes.get(checkId);
+    if (!ancestor) break;
+    const ancestorFp = fingerprint(
+      ancestor.state,
+      ancestor.tape,
+      ancestor.headPosition,
+      machine.blankSymbol,
+      settings.loopWindowSize,
+    );
+    if (ancestorFp === fp) return checkId;
+    checkId = ancestor.parentId;
+  }
+  return null;
 }
 
 // ─── initBFS ─────────────────────────────────────────────────────────────────
@@ -46,6 +76,7 @@ export function initBFS(
     transitionUsed: null,
     status: 'running',
     children: [],
+    loopOriginId: null,
   };
   nodes.set(rootConfig.id, rootConfig);
 
@@ -58,7 +89,7 @@ export function initBFS(
 
   return {
     tree,
-    queue: [{ configId: rootConfig.id, ancestorFingerprints: new Set<string>() }],
+    queue: [{ configId: rootConfig.id, ancestorFingerprints: new Map<string, number>() }],
   };
 }
 
@@ -116,7 +147,7 @@ export function processBFSEntry(
   }
 
   // ── Loop detection ──
-  let nextAncestors: ReadonlySet<string>;
+  let nextAncestors: ReadonlyMap<string, number>;
   if (settings.enableLoopDetection) {
     const fp = fingerprint(
       current.state,
@@ -127,6 +158,7 @@ export function processBFSEntry(
     );
     if (isLoop(fp, ancestorFingerprints)) {
       current.status = 'loop';
+      current.loopOriginId = findLoopOriginId(current.id, fp, tree.nodes, machine, settings);
       return { newEntries: [], shouldStop: false };
     }
     nextAncestors = extendFingerprints(ancestorFingerprints, fp);
@@ -172,6 +204,7 @@ export function processBFSEntry(
       transitionUsed: t.id,
       status: 'running',
       children: [],
+      loopOriginId: null,
     };
 
     current.children.push(child.id);
@@ -186,8 +219,10 @@ export function processBFSEntry(
 // ─── finalizeBFS ─────────────────────────────────────────────────────────────
 
 /**
- * Called when the queue is empty. Marks remaining 'running' nodes as reject
- * and resolves the final termination reason.
+ * Called when the queue is empty. Marks remaining 'running' leaf nodes as
+ * reject and resolves the final termination reason.
+ * Internal nodes (with children) keep 'running' status — they are branch
+ * points, not dead ends.
  */
 export function finalizeBFS(tree: ComputationTree): void {
   for (const node of tree.nodes.values()) {

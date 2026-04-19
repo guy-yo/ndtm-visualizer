@@ -82,6 +82,10 @@ export const useAppStore = create<AppState>()(
       set((state) => {
         Object.assign(state.machine, partial);
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
       });
     },
 
@@ -100,6 +104,10 @@ export const useAppStore = create<AppState>()(
         };
         state.machine.transitions.push(t);
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
       });
     },
 
@@ -108,6 +116,10 @@ export const useAppStore = create<AppState>()(
         const idx = state.machine.transitions.findIndex((t) => t.id === id);
         if (idx !== -1) Object.assign(state.machine.transitions[idx], partial);
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
       });
     },
 
@@ -115,6 +127,10 @@ export const useAppStore = create<AppState>()(
       set((state) => {
         state.machine.transitions = state.machine.transitions.filter((t) => t.id !== id);
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
       });
     },
 

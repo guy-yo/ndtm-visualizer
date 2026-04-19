@@ -16,6 +16,10 @@ export interface ConfigNodeData extends Record<string, unknown> {
   isCollapsed: boolean;
   depth: number;
   hasChildren: boolean;
+  /** True when this node is the ancestor whose fingerprint is repeated by a loop leaf. */
+  isLoopStart: boolean;
+  /** ID this loop node's origin, or null if not a loop node. */
+  loopOriginId: string | null;
 }
 
 export interface TransitionEdgeData extends Record<string, unknown> {

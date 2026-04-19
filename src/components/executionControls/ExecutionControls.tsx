@@ -39,9 +39,9 @@ export function ExecutionControls() {
         {/* Step */}
         <button
           className={`${styles.btn} ${styles.stepBtn}`}
-          disabled={hasErrors || isRunning || (isStepping && queueEmpty)}
+          disabled={hasErrors || isRunning || phase === 'complete' || (isStepping && queueEmpty)}
           onClick={isStepping ? stepExecution : startStepMode}
-          title={isStepping ? `Step (${bfsQueue.length} in queue)` : 'Start step-by-step mode'}
+          title={phase === 'complete' ? 'Press ↺ to reset and step again' : isStepping ? `Step (${bfsQueue.length} in queue)` : 'Start step-by-step mode'}
         >
           {isStepping
             ? `⏭ Step (${bfsQueue.length})`
