@@ -38,6 +38,9 @@ export function TransitionTable() {
                 <TransitionRow
                   key={t.id}
                   transition={t}
+                  fromStates={machine.states.filter(
+                    s => !machine.acceptStates.includes(s) && !machine.rejectStates.includes(s)
+                  )}
                   availableStates={machine.states}
                   availableSymbols={machine.tapeAlphabet}
                   blankSymbol={machine.blankSymbol}

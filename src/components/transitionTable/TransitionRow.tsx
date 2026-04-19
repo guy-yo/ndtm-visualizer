@@ -3,7 +3,8 @@ import styles from './TransitionRow.module.css';
 
 interface Props {
   transition: Transition;
-  availableStates: string[];
+  fromStates: string[];      // states allowed in FROM (excludes accept/reject)
+  availableStates: string[]; // all states, used in TO dropdown
   availableSymbols: string[];
   blankSymbol: string;
   onUpdate: (partial: Partial<Omit<Transition, 'id'>>) => void;
@@ -16,7 +17,7 @@ function symLabel(sym: string, blank: string) {
 
 const MOVES: MoveDirection[] = ['L', 'R', 'S'];
 
-export function TransitionRow({ transition, availableStates, availableSymbols, blankSymbol, onUpdate, onRemove }: Props) {
+export function TransitionRow({ transition, fromStates, availableStates, availableSymbols, blankSymbol, onUpdate, onRemove }: Props) {
   return (
     <tr className={styles.row}>
       <td>
@@ -25,7 +26,7 @@ export function TransitionRow({ transition, availableStates, availableSymbols, b
           value={transition.fromState}
           onChange={(e) => onUpdate({ fromState: e.target.value })}
         >
-          {availableStates.map((s) => <option key={s}>{s}</option>)}
+          {fromStates.map((s) => <option key={s}>{s}</option>)}
         </select>
       </td>
       <td>

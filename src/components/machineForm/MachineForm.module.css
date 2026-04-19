@@ -20,3 +20,100 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* Tape alphabet row: text input + fixed blank badge */
+.tapeAlphabetField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.blankBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--color-text);
+  align-self: flex-start;
+  user-select: none;
+}
+
+.blankBadgeNote {
+  font-size: 10px;
+  font-family: sans-serif;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Constants section (start state, accept/reject states) */
+.constants {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--color-surface-2);
+}
+
+.constantsLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.constantRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+}
+
+.constantKey {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.constantVal {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.constantInput {
+  flex: 1;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 3px 7px;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+
+.constantInput:focus {
+  border-color: var(--color-accent);
+}
+
+.constantInputError {
+  border-color: var(--color-reject) !important;
+}

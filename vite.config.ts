@@ -6,4 +6,8 @@ export default defineConfig({
   resolve: {
     alias: { '@': '/src' },
   },
+  optimizeDeps: {
+    // Bundle immer separately so setAutoFreeze is accessible as a named export
+    include: ['immer'],
+  },
 })

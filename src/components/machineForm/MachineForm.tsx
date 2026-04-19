@@ -1,8 +1,10 @@
 import { useAppStore } from '../../store/useAppStore';
 import { StatesInput } from './StatesInput';
-import { StateDropdown } from './StateDropdown';
-import { StateMultiSelect } from './StateMultiSelect';
 import styles from './MachineForm.module.css';
+
+function parseList(raw: string): string[] {
+  return raw.split(',').map(s => s.trim()).filter(Boolean);
+}
 
 export function MachineForm() {
   const machine = useAppStore((s) => s.machine);
@@ -13,11 +15,11 @@ export function MachineForm() {
     return errors.find((e) => e.field === field)?.message;
   }
 
-  // Always keep the blank symbol in the tape alphabet — cannot be removed
+  // Tape alphabet excludes blank symbol in the text field — blank shown as a fixed badge
   function handleTapeAlphabet(vals: string[]) {
     const withBlank = vals.includes(machine.blankSymbol)
       ? vals
-      : [machine.blankSymbol, ...vals];
+      : [...vals, machine.blankSymbol];
     setMachine({ tapeAlphabet: withBlank });
   }
 
@@ -25,6 +27,7 @@ export function MachineForm() {
     <section className={styles.section}>
       <h2 className={styles.title}>Machine Definition</h2>
       <div className={styles.grid}>
+
         <StatesInput
           label="States"
           value={machine.states}
@@ -32,6 +35,7 @@ export function MachineForm() {
           error={errFor('states')}
           placeholder="q0, q1, qacc, qrej"
         />
+
         <StatesInput
           label="Input Alphabet"
           value={machine.inputAlphabet}
@@ -39,42 +43,72 @@ export function MachineForm() {
           error={errFor('inputAlphabet')}
           placeholder="0, 1"
         />
-        <StatesInput
-          label="Tape Alphabet"
-          value={machine.tapeAlphabet}
-          onChange={handleTapeAlphabet}
-          error={errFor('tapeAlphabet')}
-          placeholder="0, 1, ⊔"
-          blankSymbol={machine.blankSymbol}
-        />
-        <StateDropdown
-          label="Blank Symbol (⊔)"
-          options={machine.tapeAlphabet}
-          value={machine.blankSymbol}
-          onChange={(v) => setMachine({ blankSymbol: v })}
-          error={errFor('blankSymbol')}
-          blankSymbol={machine.blankSymbol}
-        />
-        <StateDropdown
-          label="Start State"
-          options={machine.states}
-          value={machine.startState}
-          onChange={(v) => setMachine({ startState: v })}
-          error={errFor('startState')}
-        />
-        <StateMultiSelect
-          label="Accept State(s)"
-          options={machine.states.filter((s) => !machine.rejectStates.includes(s))}
-          selected={machine.acceptStates}
-          onChange={(v) => setMachine({ acceptStates: v })}
-          error={errFor('acceptStates')}
-        />
-        <StateMultiSelect
-          label="Reject State(s) (optional)"
-          options={machine.states.filter((s) => !machine.acceptStates.includes(s))}
-          selected={machine.rejectStates}
-          onChange={(v) => setMachine({ rejectStates: v })}
-        />
+
+        {/* Tape alphabet: blank symbol shown separately as a fixed non-removable badge */}
+        <div className={styles.tapeAlphabetField}>
+          <StatesInput
+            label="Tape Alphabet"
+            value={machine.tapeAlphabet.filter(s => s !== machine.blankSymbol)}
+            onChange={handleTapeAlphabet}
+            error={errFor('tapeAlphabet')}
+            placeholder="0, 1"
+          />
+          <div className={styles.blankBadge} title="Blank symbol — always part of the tape alphabet and cannot be removed">
+            ⊔ <span className={styles.blankBadgeNote}>always present</span>
+          </div>
+        </div>
+
+        {/* Constants — text inputs (no dropdowns / choosers) */}
+        <div className={styles.constants}>
+          <span className={styles.constantsLabel}>Constants</span>
+
+          {/* Blank symbol: shown as a fixed label (always ⊔) */}
+          <div className={styles.constantRow}>
+            <span className={styles.constantKey}>Blank symbol</span>
+            <span className={styles.constantVal}>⊔</span>
+          </div>
+
+          {/* Start state */}
+          <div className={styles.constantRow}>
+            <span className={styles.constantKey}>Start state</span>
+            <input
+              className={`${styles.constantInput} ${errFor('startState') ? styles.constantInputError : ''}`}
+              value={machine.startState}
+              onChange={(e) => setMachine({ startState: e.target.value.trim() })}
+              spellCheck={false}
+              placeholder="q0"
+            />
+          </div>
+
+          {/* Accept states */}
+          <div className={styles.constantRow}>
+            <span className={styles.constantKey}>Accept state(s)</span>
+            <input
+              className={`${styles.constantInput} ${errFor('acceptStates') ? styles.constantInputError : ''}`}
+              defaultValue={machine.acceptStates.join(', ')}
+              key={machine.acceptStates.join(',')}
+              onBlur={(e) => setMachine({ acceptStates: parseList(e.target.value) })}
+              onChange={(e) => setMachine({ acceptStates: parseList(e.target.value) })}
+              spellCheck={false}
+              placeholder="qacc"
+            />
+          </div>
+
+          {/* Reject states */}
+          <div className={styles.constantRow}>
+            <span className={styles.constantKey}>Reject state(s)</span>
+            <input
+              className={styles.constantInput}
+              defaultValue={machine.rejectStates.join(', ')}
+              key={machine.rejectStates.join(',')}
+              onBlur={(e) => setMachine({ rejectStates: parseList(e.target.value) })}
+              onChange={(e) => setMachine({ rejectStates: parseList(e.target.value) })}
+              spellCheck={false}
+              placeholder="qrej"
+            />
+          </div>
+        </div>
+
       </div>
     </section>
   );
