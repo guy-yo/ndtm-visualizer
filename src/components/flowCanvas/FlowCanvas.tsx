@@ -24,6 +24,7 @@ export function FlowCanvas() {
   const collapsedNodeIds = useAppStore((s) => s.collapsedNodeIds);
   const highlightAcceptPath = useAppStore((s) => s.highlightAcceptPath);
   const allTransitions = useAppStore((s) => s.machine.transitions);
+  const blankSymbol = useAppStore((s) => s.machine.blankSymbol);
   const phase = useAppStore((s) => s.executionPhase);
   const inputString = useAppStore((s) => s.inputString);
 
@@ -31,7 +32,8 @@ export function FlowCanvas() {
     tree,
     collapsedNodeIds,
     highlightAcceptPath,
-    allTransitions
+    allTransitions,
+    blankSymbol
   );
 
   if (phase === 'idle') {

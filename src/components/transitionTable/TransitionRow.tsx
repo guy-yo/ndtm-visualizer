@@ -35,6 +35,7 @@ export function TransitionRow({ transition, fromStates, availableStates, availab
           value={transition.readSymbol}
           onChange={(e) => onUpdate({ readSymbol: e.target.value })}
         >
+          <option value="*">* — any</option>
           {availableSymbols.map((s) => <option key={s} value={s}>{symLabel(s, blankSymbol)}</option>)}
         </select>
       </td>
@@ -54,6 +55,7 @@ export function TransitionRow({ transition, fromStates, availableStates, availab
           value={transition.writeSymbol}
           onChange={(e) => onUpdate({ writeSymbol: e.target.value })}
         >
+          <option value="*">* — keep</option>
           {availableSymbols.map((s) => <option key={s} value={s}>{symLabel(s, blankSymbol)}</option>)}
         </select>
       </td>

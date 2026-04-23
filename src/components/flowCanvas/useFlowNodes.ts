@@ -33,15 +33,17 @@ function collectVisible(
   return visible;
 }
 
-function formatTransitionLabel(t: Transition): string {
-  return `${t.readSymbol}→${t.writeSymbol},${t.move}`;
+function formatTransitionLabel(t: Transition, blank: string): string {
+  const disp = (s: string) => s === blank ? '⊔' : s;
+  return `${disp(t.readSymbol)}→${disp(t.writeSymbol)},${t.move}`;
 }
 
 export function useFlowNodes(
   tree: ComputationTree | null,
   collapsedIds: Set<string>,
   highlightAcceptPath: boolean,
-  allTransitions: Transition[]
+  allTransitions: Transition[],
+  blankSymbol: string
 ): { nodes: Node<ConfigNodeData>[]; edges: Edge<TransitionEdgeData>[] } {
   return useMemo(() => {
     if (!tree) return { nodes: [], edges: [] };
@@ -93,7 +95,7 @@ export function useFlowNodes(
       // Tree edge (parent → child)
       if (config.parentId && visibleIds.has(config.parentId)) {
         const t = config.transitionUsed ? transitionMap.get(config.transitionUsed) : null;
-        const label = t ? formatTransitionLabel(t) : '';
+        const label = t ? formatTransitionLabel(t, blankSymbol) : '';
         const isOnPath = acceptSet.has(id) && acceptSet.has(config.parentId);
 
         rawEdges.push({
@@ -147,5 +149,5 @@ export function useFlowNodes(
     }
 
     return { nodes, edges: [...edges, ...backEdges] };
-  }, [tree, collapsedIds, highlightAcceptPath, allTransitions]);
+  }, [tree, collapsedIds, highlightAcceptPath, allTransitions, blankSymbol]);
 }

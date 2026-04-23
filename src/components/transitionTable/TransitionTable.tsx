@@ -17,6 +17,20 @@ export function TransitionTable() {
         </button>
       </div>
 
+      {/* Wildcard legend — always visible so users know the special symbols */}
+      <div className={styles.legend}>
+        <div className={styles.legendRow}>
+          <code className={styles.legendCode}>*</code>
+          <span className={styles.legendSep}>in READ</span>
+          <span className={styles.legendDesc}>match any symbol from the tape alphabet</span>
+        </div>
+        <div className={styles.legendRow}>
+          <code className={styles.legendCode}>*</code>
+          <span className={styles.legendSep}>in WRITE</span>
+          <span className={styles.legendDesc}>write back whatever was read (no change)</span>
+        </div>
+      </div>
+
       {machine.transitions.length === 0 ? (
         <div className={styles.empty}>No transitions defined. Click &quot;Add Row&quot; to start.</div>
       ) : (
