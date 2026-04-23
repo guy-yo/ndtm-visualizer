@@ -20,15 +20,16 @@ export function fingerprint(
  * `ancestorFingerprints` maps each fingerprint to how many times it has
  * appeared in the current branch's ancestor chain.
  *
- * Returns true when the count reaches 2, meaning the branch has already
- * completed one full repeat (the second repeat is now being attempted).
- * This lets ONE visible "extra" iteration appear in the tree before cutting off.
+ * Returns true when the count reaches 1, meaning the exact same
+ * (state, headPosition, tapeWindow) has already appeared as an ancestor —
+ * the branch will loop forever. Cut off here; the cycle is already visible
+ * above as the full state chain that led back to this fingerprint.
  */
 export function isLoop(
   fp: string,
   ancestorFingerprints: ReadonlyMap<string, number>
 ): boolean {
-  return (ancestorFingerprints.get(fp) ?? 0) >= 2;
+  return (ancestorFingerprints.get(fp) ?? 0) >= 1;
 }
 
 /**
