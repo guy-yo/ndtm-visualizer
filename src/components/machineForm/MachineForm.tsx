@@ -34,6 +34,7 @@ export function MachineForm() {
           onChange={(v) => setMachine({ states: v })}
           error={errFor('states')}
           placeholder="q0, q1, qacc, qrej"
+          hint="All the states your machine can be in — separate with commas."
         />
 
         <StatesInput
@@ -42,6 +43,7 @@ export function MachineForm() {
           onChange={(v) => setMachine({ inputAlphabet: v })}
           error={errFor('inputAlphabet')}
           placeholder="0, 1"
+          hint="Symbols allowed in the input string."
         />
 
         {/* Tape alphabet: blank symbol shown separately as a fixed non-removable badge */}
@@ -52,6 +54,7 @@ export function MachineForm() {
             onChange={handleTapeAlphabet}
             error={errFor('tapeAlphabet')}
             placeholder="0, 1"
+            hint="Everything the machine can write — includes input symbols plus extras."
           />
           <div className={styles.blankBadge} title="Blank symbol — always part of the tape alphabet and cannot be removed">
             ⊔ <span className={styles.blankBadgeNote}>always present</span>

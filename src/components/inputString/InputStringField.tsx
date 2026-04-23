@@ -27,7 +27,7 @@ export function InputStringField() {
         </span>
       )}
       <span className={styles.hint}>
-        Input alphabet: {machine.inputAlphabet.length > 0 ? machine.inputAlphabet.join(', ') : '(none)'}
+        Allowed: {machine.inputAlphabet.length > 0 ? machine.inputAlphabet.join(', ') : '(none)'} · this is what the machine will read
       </span>
     </section>
   );

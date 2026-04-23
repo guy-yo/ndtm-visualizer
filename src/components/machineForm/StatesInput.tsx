@@ -7,6 +7,7 @@ interface Props {
   onChange: (values: string[]) => void;
   error?: string;
   placeholder?: string;
+  hint?: string;
   /** If provided, this symbol is displayed as ⊔ and ⊔ is parsed back to it */
   blankSymbol?: string;
 }
@@ -24,30 +25,29 @@ function fromDisplay(raw: string, blank?: string): string[] {
     .map((s) => (blank && s === '⊔' ? blank : s));
 }
 
-export function StatesInput({ label, value, onChange, error, placeholder, blankSymbol }: Props) {
-  const raw = toDisplay(value, blankSymbol);
+export function StatesInput({ label, value, onChange, error, placeholder, hint, blankSymbol }: Props) {
+  // Local draft: typing updates draft only; commit (setMachine) fires only on blur
+  const [draft, setDraft] = React.useState(() => toDisplay(value, blankSymbol));
 
-  function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
-    onChange(fromDisplay(e.target.value, blankSymbol));
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(fromDisplay(e.target.value, blankSymbol));
-  }
+  // Sync draft when the external value changes (e.g. machine reset, load example)
+  const externalKey = toDisplay(value, blankSymbol);
+  React.useEffect(() => {
+    setDraft(externalKey);
+  }, [externalKey]);
 
   return (
     <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
+      {label && <label className={styles.label}>{label}</label>}
       <input
         className={`${styles.input} ${error ? styles.inputError : ''}`}
-        defaultValue={raw}
-        key={raw}
-        onBlur={handleBlur}
-        onChange={handleChange}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={(e) => onChange(fromDisplay(e.target.value, blankSymbol))}
         placeholder={placeholder ?? 'comma-separated'}
         spellCheck={false}
       />
       {error && <span className={styles.error}>{error}</span>}
+      {hint && !error && <span className={styles.hint}>{hint}</span>}
     </div>
   );
 }

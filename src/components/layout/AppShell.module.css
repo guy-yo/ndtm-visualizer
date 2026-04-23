@@ -67,3 +67,20 @@
   overflow: hidden;
   background: var(--color-bg);
 }
+
+/* Onboarding tip shown in sidebar header when idle */
+.tip {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--color-text);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.tip strong {
+  color: var(--color-accent);
+  font-weight: 600;
+}
