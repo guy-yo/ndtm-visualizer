@@ -42,6 +42,7 @@ interface AppState {
   addTransition: () => void;
   updateTransition: (id: string, partial: Partial<Omit<Transition, 'id'>>) => void;
   removeTransition: (id: string) => void;
+  clearTransitions: () => void;
 
   // Input
   setInputString: (s: string) => void;
@@ -126,6 +127,17 @@ export const useAppStore = create<AppState>()(
     removeTransition: (id) => {
       set((state) => {
         state.machine.transitions = state.machine.transitions.filter((t) => t.id !== id);
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+      });
+    },
+
+    clearTransitions: () => {
+      set((state) => {
+        state.machine.transitions = [];
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
         state.tree = null;
         state.bfsQueue = [];

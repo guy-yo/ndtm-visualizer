@@ -7,14 +7,22 @@ export function TransitionTable() {
   const addTransition = useAppStore((s) => s.addTransition);
   const updateTransition = useAppStore((s) => s.updateTransition);
   const removeTransition = useAppStore((s) => s.removeTransition);
+  const clearTransitions = useAppStore((s) => s.clearTransitions);
 
   return (
     <section className={styles.section}>
       <div className={styles.header}>
         <h2 className={styles.title}>Transition Function</h2>
-        <button className={styles.addBtn} onClick={addTransition}>
-          + Add Row
-        </button>
+        <div className={styles.headerBtns}>
+          {machine.transitions.length > 0 && (
+            <button className={styles.clearBtn} onClick={clearTransitions} title="Remove all transitions">
+              Clear all
+            </button>
+          )}
+          <button className={styles.addBtn} onClick={addTransition}>
+            + Add Row
+          </button>
+        </div>
       </div>
 
       {/* Wildcard legend — always visible so users know the special symbols */}
@@ -36,6 +44,9 @@ export function TransitionTable() {
       ) : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
+            <colgroup>
+              <col /><col /><col /><col /><col /><col /><col />
+            </colgroup>
             <thead>
               <tr>
                 <th>From</th>
@@ -43,7 +54,7 @@ export function TransitionTable() {
                 <th></th>
                 <th>To</th>
                 <th>Write</th>
-                <th>Move</th>
+                <th>Mv</th>
                 <th></th>
               </tr>
             </thead>

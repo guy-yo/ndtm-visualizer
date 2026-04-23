@@ -1,6 +1,6 @@
 .shell {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 390px 1fr;
   height: 100vh;
   overflow: hidden;
   background: var(--color-bg);
