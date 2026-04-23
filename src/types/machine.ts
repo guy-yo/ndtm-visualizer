@@ -69,11 +69,11 @@ export function validateMachine(machine: NTMDefinition): ValidationError[] {
     if (!stateSet.has(t.toState)) {
       errors.push({ field: 'transitions', message: `Transition to unknown state "${t.toState}"` });
     }
-    // '*' is a reserved wildcard: read-any or write-same — skip symbol validation for it
-    if (t.readSymbol !== '*' && !tapeSet.has(t.readSymbol)) {
+    // 'Σ' is a reserved wildcard: read-any or write-same — skip symbol validation for it
+    if (t.readSymbol !== 'Σ' && !tapeSet.has(t.readSymbol)) {
       errors.push({ field: 'transitions', message: `Transition reads unknown symbol "${t.readSymbol}"` });
     }
-    if (t.writeSymbol !== '*' && !tapeSet.has(t.writeSymbol)) {
+    if (t.writeSymbol !== 'Σ' && !tapeSet.has(t.writeSymbol)) {
       errors.push({ field: 'transitions', message: `Transition writes unknown symbol "${t.writeSymbol}"` });
     }
   }

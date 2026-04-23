@@ -168,9 +168,9 @@ export function processBFSEntry(
 
   // ── Find transitions ──
   const readSym = readCell(current.tape, current.headPosition, machine.blankSymbol);
-  // '*' in readSymbol is a wildcard — matches any tape symbol
+  // 'Σ' in readSymbol is a wildcard — matches any tape symbol
   const applicable = machine.transitions.filter(
-    (t) => t.fromState === current.state && (t.readSymbol === '*' || t.readSymbol === readSym),
+    (t) => t.fromState === current.state && (t.readSymbol === 'Σ' || t.readSymbol === readSym),
   );
 
   if (applicable.length === 0) {
@@ -186,8 +186,8 @@ export function processBFSEntry(
       return { newEntries, shouldStop: true };
     }
 
-    // '*' in writeSymbol means "write back whatever was read" (no-change / identity)
-    const writeVal = t.writeSymbol === '*' ? readSym : t.writeSymbol;
+    // 'Σ' in writeSymbol means "write back whatever was read" (no-change / identity)
+    const writeVal = t.writeSymbol === 'Σ' ? readSym : t.writeSymbol;
     const newTape: TapeMap = writeCell(
       current.tape,
       current.headPosition,

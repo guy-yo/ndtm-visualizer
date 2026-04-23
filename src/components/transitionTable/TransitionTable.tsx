@@ -20,12 +20,12 @@ export function TransitionTable() {
       {/* Wildcard legend — always visible so users know the special symbols */}
       <div className={styles.legend}>
         <div className={styles.legendRow}>
-          <code className={styles.legendCode}>*</code>
+          <code className={styles.legendCode}>Σ</code>
           <span className={styles.legendSep}>in READ</span>
           <span className={styles.legendDesc}>match any symbol from the tape alphabet</span>
         </div>
         <div className={styles.legendRow}>
-          <code className={styles.legendCode}>*</code>
+          <code className={styles.legendCode}>Σ</code>
           <span className={styles.legendSep}>in WRITE</span>
           <span className={styles.legendDesc}>write back whatever was read (no change)</span>
         </div>
