@@ -2,10 +2,6 @@ import { useAppStore } from '../../store/useAppStore';
 import { StatesInput } from './StatesInput';
 import styles from './MachineForm.module.css';
 
-function parseList(raw: string): string[] {
-  return raw.split(',').map(s => s.trim()).filter(Boolean);
-}
-
 export function MachineForm() {
   const machine = useAppStore((s) => s.machine);
   const errors = useAppStore((s) => s.machineErrors);
@@ -61,54 +57,32 @@ export function MachineForm() {
           </div>
         </div>
 
-        {/* Constants — text inputs (no dropdowns / choosers) */}
+        {/* Constants — all read-only display values, nothing is editable here */}
         <div className={styles.constants}>
           <span className={styles.constantsLabel}>Constants</span>
 
-          {/* Blank symbol: shown as a fixed label (always ⊔) */}
           <div className={styles.constantRow}>
             <span className={styles.constantKey}>Blank symbol</span>
             <span className={styles.constantVal}>⊔</span>
           </div>
 
-          {/* Start state */}
           <div className={styles.constantRow}>
             <span className={styles.constantKey}>Start state</span>
-            <input
-              className={`${styles.constantInput} ${errFor('startState') ? styles.constantInputError : ''}`}
-              value={machine.startState}
-              onChange={(e) => setMachine({ startState: e.target.value.trim() })}
-              spellCheck={false}
-              placeholder="q0"
-            />
+            <span className={styles.constantVal}>{machine.startState || '—'}</span>
           </div>
 
-          {/* Accept states */}
           <div className={styles.constantRow}>
             <span className={styles.constantKey}>Accept state(s)</span>
-            <input
-              className={`${styles.constantInput} ${errFor('acceptStates') ? styles.constantInputError : ''}`}
-              defaultValue={machine.acceptStates.join(', ')}
-              key={machine.acceptStates.join(',')}
-              onBlur={(e) => setMachine({ acceptStates: parseList(e.target.value) })}
-              onChange={(e) => setMachine({ acceptStates: parseList(e.target.value) })}
-              spellCheck={false}
-              placeholder="qacc"
-            />
+            <span className={styles.constantVal}>
+              {machine.acceptStates.length ? machine.acceptStates.join(', ') : '—'}
+            </span>
           </div>
 
-          {/* Reject states */}
           <div className={styles.constantRow}>
             <span className={styles.constantKey}>Reject state(s)</span>
-            <input
-              className={styles.constantInput}
-              defaultValue={machine.rejectStates.join(', ')}
-              key={machine.rejectStates.join(',')}
-              onBlur={(e) => setMachine({ rejectStates: parseList(e.target.value) })}
-              onChange={(e) => setMachine({ rejectStates: parseList(e.target.value) })}
-              spellCheck={false}
-              placeholder="qrej"
-            />
+            <span className={styles.constantVal}>
+              {machine.rejectStates.length ? machine.rejectStates.join(', ') : '—'}
+            </span>
           </div>
         </div>
 

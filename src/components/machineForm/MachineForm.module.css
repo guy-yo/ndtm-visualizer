@@ -87,6 +87,7 @@
 }
 
 .constantVal {
+  flex: 1;
   font-family: 'Courier New', monospace;
   font-size: 13px;
   color: var(--color-text);
@@ -94,26 +95,9 @@
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 2px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: text;
 }
 
-.constantInput {
-  flex: 1;
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  color: var(--color-text);
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  padding: 3px 7px;
-  outline: none;
-  transition: border-color 0.15s;
-  min-width: 0;
-}
-
-.constantInput:focus {
-  border-color: var(--color-accent);
-}
-
-.constantInputError {
-  border-color: var(--color-reject) !important;
-}
