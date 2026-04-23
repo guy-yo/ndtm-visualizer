@@ -66,6 +66,12 @@ export function ExecutionControls() {
         </div>
       )}
 
+      <div className={styles.shortcuts}>
+        <span className={styles.shortcut}><kbd>Space</kbd> Run / Step</span>
+        <span className={styles.shortcut}><kbd>R</kbd> Reset</span>
+        <span className={styles.shortcut}><kbd>H</kbd> Highlight</span>
+      </div>
+
       {hasErrors && (
         <div className={styles.errorList}>
           {errors.map((e, i) => (

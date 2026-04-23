@@ -1,4 +1,4 @@
-import type { TapeMap, NodeStatus } from './engine';
+import type { TapeMap, NodeStatus, RejectReason } from './engine';
 import type { MoveDirection } from './machine';
 
 // Both interfaces extend Record<string, unknown> to satisfy @xyflow/react's
@@ -20,6 +20,8 @@ export interface ConfigNodeData extends Record<string, unknown> {
   isLoopStart: boolean;
   /** ID this loop node's origin, or null if not a loop node. */
   loopOriginId: string | null;
+  /** Why this node rejected. Null unless status === 'reject'. */
+  rejectReason: RejectReason;
 }
 
 export interface TransitionEdgeData extends Record<string, unknown> {

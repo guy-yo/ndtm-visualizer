@@ -85,6 +85,15 @@
 }
 
 .tapeWrap {
-  padding: 8px 10px 10px;
+  padding: 8px 10px 6px;
   min-height: 44px;
+}
+
+.rejectReason {
+  font-size: 9px;
+  font-style: italic;
+  color: var(--color-text-muted);
+  padding: 0 10px 6px;
+  text-align: right;
+  opacity: 0.8;
 }

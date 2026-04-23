@@ -74,6 +74,31 @@
   border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
+.shortcuts {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.shortcut kbd {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  color: var(--color-text);
+}
+
 .errorList {
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid var(--color-reject);

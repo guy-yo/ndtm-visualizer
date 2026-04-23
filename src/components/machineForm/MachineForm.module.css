@@ -4,15 +4,68 @@
   gap: 12px;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 8px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .title {
   font-size: 13px;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+/* Examples dropdown */
+.examplesSelect {
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 6px;
+  max-width: 110px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.examplesSelect:focus {
+  border-color: var(--color-accent);
+}
+
+/* Save / Load buttons */
+.ioButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.ioBtn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 7px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.ioBtn:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
 }
 
 .grid {

@@ -88,6 +88,7 @@ export function useFlowNodes(
           hasChildren,
           isLoopStart: loopStartIds.has(id),
           loopOriginId: config.loopOriginId,
+          rejectReason: config.rejectReason,
         },
         draggable: false,
       });

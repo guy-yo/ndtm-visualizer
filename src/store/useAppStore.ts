@@ -57,6 +57,8 @@ interface AppState {
   resetExecution: () => void;
 
   // UI
+  viewMode: 'tree' | 'diagram';
+  setViewMode: (mode: 'tree' | 'diagram') => void;
   toggleCollapse: (nodeId: string) => void;
   setHoveredNode: (id: string | null) => void;
   setHighlightAcceptPath: (v: boolean) => void;
@@ -76,6 +78,7 @@ export const useAppStore = create<AppState>()(
     highlightAcceptPath: true,
     collapsedNodeIds: new Set(),
     hoveredNodeId: null,
+    viewMode: 'tree' as const,
     rfNodes: [],
     rfEdges: [],
 
@@ -241,6 +244,7 @@ export const useAppStore = create<AppState>()(
       });
     },
 
+    setViewMode: (mode) => set((state) => { state.viewMode = mode; }),
     setHoveredNode: (id) => set((state) => { state.hoveredNodeId = id; }),
     setHighlightAcceptPath: (v) => set((state) => { state.highlightAcceptPath = v; }),
     setRfNodes: (nodes) => set((state) => { state.rfNodes = nodes as unknown as typeof state.rfNodes; }),

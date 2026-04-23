@@ -1,0 +1,53 @@
+.circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2.5px solid var(--color-border);
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.circle:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.label {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  padding: 0 6px;
+  word-break: break-all;
+}
+
+/* Accept state: double ring via outline */
+.accept {
+  border-color: var(--color-accept);
+  outline: 2.5px solid var(--color-accept);
+  outline-offset: 4px;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.25);
+}
+
+/* Reject state: red border */
+.reject {
+  border-color: var(--color-reject);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+
+/* Start state: arrow to the left of the circle */
+.startArrow {
+  position: absolute;
+  left: -26px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  user-select: none;
+}

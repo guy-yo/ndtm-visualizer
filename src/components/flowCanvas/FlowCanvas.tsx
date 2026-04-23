@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   ReactFlow,
   Background,
@@ -9,6 +10,7 @@ import '@xyflow/react/dist/style.css';
 import { useAppStore } from '../../store/useAppStore';
 import { nodeTypes } from '../customNodes/ConfigNode';
 import { useFlowNodes } from './useFlowNodes';
+import { ExportButton } from './ExportButton';
 import type { NodeStatus } from '../../types/engine';
 import styles from './FlowCanvas.module.css';
 
@@ -20,6 +22,7 @@ const STATUS_COLORS: Record<NodeStatus, string> = {
 };
 
 export function FlowCanvas() {
+  const canvasRef = React.useRef<HTMLDivElement>(null);
   const tree = useAppStore((s) => s.tree);
   const collapsedNodeIds = useAppStore((s) => s.collapsedNodeIds);
   const highlightAcceptPath = useAppStore((s) => s.highlightAcceptPath);
@@ -84,7 +87,8 @@ export function FlowCanvas() {
   }
 
   return (
-    <div className={styles.canvas}>
+    <div className={styles.canvas} ref={canvasRef}>
+      <ExportButton canvasRef={canvasRef} />
       <ReactFlow
         nodes={nodes}
         edges={edges}

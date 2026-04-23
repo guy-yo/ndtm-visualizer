@@ -2,6 +2,8 @@ export type TapeMap = Map<number, string>;
 
 export type NodeStatus = 'running' | 'accept' | 'reject' | 'loop';
 
+export type RejectReason = 'no-transition' | 'depth-limit' | 'explicit' | 'node-limit' | null;
+
 export type TerminationReason =
   | 'accept'
   | 'exhausted'
@@ -21,6 +23,8 @@ export interface NTMConfig {
   children: string[];
   /** ID of the ancestor node whose fingerprint matches this loop node. Null unless status === 'loop'. */
   loopOriginId: string | null;
+  /** Why this node was rejected. Null unless status === 'reject'. */
+  rejectReason: RejectReason;
 }
 
 export interface TreeStats {

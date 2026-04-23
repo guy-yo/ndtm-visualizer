@@ -77,6 +77,7 @@ export function initBFS(
     status: 'running',
     children: [],
     loopOriginId: null,
+    rejectReason: null,
   };
   nodes.set(rootConfig.id, rootConfig);
 
@@ -129,12 +130,14 @@ export function processBFSEntry(
   // ── Explicit reject ──
   if (rejectStateSet.has(current.state)) {
     current.status = 'reject';
+    current.rejectReason = 'explicit';
     return { newEntries: [], shouldStop: false };
   }
 
   // ── Depth limit ──
   if (current.depth >= settings.maxDepth) {
     current.status = 'reject';
+    current.rejectReason = 'depth-limit';
     if (tree.stats.terminationReason === 'running') tree.stats.terminationReason = 'max-depth';
     return { newEntries: [], shouldStop: false };
   }
@@ -142,6 +145,7 @@ export function processBFSEntry(
   // ── Node limit ──
   if (tree.nodes.size >= settings.maxNodes) {
     current.status = 'reject';
+    current.rejectReason = 'node-limit';
     tree.stats.terminationReason = 'max-nodes';
     return { newEntries: [], shouldStop: true };
   }
@@ -175,6 +179,7 @@ export function processBFSEntry(
 
   if (applicable.length === 0) {
     current.status = 'reject';
+    current.rejectReason = 'no-transition';
     return { newEntries: [], shouldStop: false };
   }
 
@@ -183,6 +188,7 @@ export function processBFSEntry(
   for (const t of applicable) {
     if (tree.nodes.size >= settings.maxNodes) {
       tree.stats.terminationReason = 'max-nodes';
+      current.rejectReason = 'node-limit';
       return { newEntries, shouldStop: true };
     }
 
@@ -208,6 +214,7 @@ export function processBFSEntry(
       status: 'running',
       children: [],
       loopOriginId: null,
+      rejectReason: null,
     };
 
     current.children.push(child.id);
@@ -233,6 +240,7 @@ export function finalizeBFS(tree: ComputationTree): void {
     // 'running' to show they were explored and branched, not dead ends.
     if (node.status === 'running' && node.children.length === 0) {
       node.status = 'reject';
+      node.rejectReason = 'no-transition';
     }
   }
   if (tree.stats.terminationReason === 'running') {
