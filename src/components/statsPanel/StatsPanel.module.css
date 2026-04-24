@@ -38,9 +38,17 @@
   border: 1px solid var(--color-reject);
 }
 
+.verdictStepping {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-running);
+  border: 1px solid var(--color-running);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Core stat boxes ──────────────────────────────────────────── */
 .stats {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .stat {
@@ -51,18 +59,18 @@
   gap: 2px;
   background: var(--color-surface);
   border-radius: 4px;
-  padding: 6px;
+  padding: 5px 4px;
 }
 
 .statLabel {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .statValue {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-text);
   font-family: 'Courier New', monospace;
@@ -74,6 +82,143 @@
   text-align: center;
 }
 
+/* ── Per-status pills ─────────────────────────────────────────── */
+.pillRow {
+  display: flex;
+  gap: 5px;
+}
+
+.pill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border-radius: 4px;
+  padding: 4px 2px;
+  border: 1px solid transparent;
+}
+
+.pillValue {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.pillLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pillAccept {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: var(--color-accept);
+}
+
+.pillReject {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-reject);
+}
+
+.pillLoop {
+  background: rgba(107, 114, 128, 0.08);
+  border-color: rgba(107, 114, 128, 0.3);
+  color: var(--color-loop);
+}
+
+.pillRunning {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--color-running);
+}
+
+/* ── Depth histogram ──────────────────────────────────────────── */
+.histogram {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.histLabel {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Accept paths (playback) ─────────────────────────────────── */
+.acceptPathsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.acceptPathsTitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.acceptPathsHint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-style: italic;
+}
+
+.acceptPathsList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.acceptPathBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.acceptPathBtn:hover {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: var(--color-accept);
+  color: var(--color-accept);
+}
+
+.acceptPathActive {
+  background: rgba(34, 197, 94, 0.12) !important;
+  border-color: var(--color-accept) !important;
+  color: var(--color-accept) !important;
+}
+
+.pathLen {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.moreHint {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── Misc ─────────────────────────────────────────────────────── */
 .running {
   font-size: 13px;
   color: var(--color-running);

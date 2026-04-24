@@ -5,13 +5,21 @@ import styles from './ExportButton.module.css';
 
 interface Props {
   canvasRef: React.RefObject<HTMLDivElement>;
+  /** When true the button renders even when phase === 'idle' */
+  alwaysVisible?: boolean;
+  /** File name for the downloaded PNG (default: 'computation-tree.png') */
+  filename?: string;
 }
 
-export function ExportButton({ canvasRef }: Props) {
+export function ExportButton({
+  canvasRef,
+  alwaysVisible,
+  filename = 'computation-tree.png',
+}: Props) {
   const phase = useAppStore((s) => s.executionPhase);
   const [exporting, setExporting] = React.useState(false);
 
-  if (phase === 'idle') return null;
+  if (!alwaysVisible && phase === 'idle') return null;
 
   async function handleExport() {
     if (!canvasRef.current) return;
@@ -23,7 +31,7 @@ export function ExportButton({ canvasRef }: Props) {
       });
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = 'computation-tree.png';
+      a.download = filename;
       a.click();
     } catch (err) {
       console.error('PNG export failed:', err);

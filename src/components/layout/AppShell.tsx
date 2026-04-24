@@ -7,20 +7,38 @@ import { StatsPanel } from '../statsPanel/StatsPanel';
 import { BatchTest } from '../batchTest/BatchTest';
 import { FlowCanvas } from '../flowCanvas/FlowCanvas';
 import { StateDiagram } from '../stateDiagram/StateDiagram';
+import { ShortcutLegend } from './ShortcutLegend';
 import styles from './AppShell.module.css';
 
 export function AppShell() {
-  const phase = useAppStore((s) => s.executionPhase);
+  const phase    = useAppStore((s) => s.executionPhase);
   const viewMode = useAppStore((s) => s.viewMode);
   const setViewMode = useAppStore((s) => s.setViewMode);
-  const isIdle = phase === 'idle';
+  const theme    = useAppStore((s) => s.theme);
+  const setTheme = useAppStore((s) => s.setTheme);
+  const isIdle   = phase === 'idle';
 
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <h1 className={styles.appTitle}>NDTM Visualizer</h1>
-          <span className={styles.appSub}>Nondeterministic Turing Machine</span>
+          <div className={styles.headerRow}>
+            <div>
+              <h1 className={styles.appTitle}>NDTM Visualizer</h1>
+              <span className={styles.appSub}>Nondeterministic Turing Machine</span>
+            </div>
+            <div className={styles.headerButtons}>
+              <ShortcutLegend />
+              <button
+                className={styles.themeBtn}
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? '☀' : '🌙'}
+              </button>
+            </div>
+          </div>
           {isIdle && (
             <div className={styles.tip}>
               👋 <strong>New here?</strong> A sample machine is preloaded.

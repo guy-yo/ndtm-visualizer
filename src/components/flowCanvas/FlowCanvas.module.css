@@ -84,3 +84,82 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ── State filter input ──────────────────────────────────────── */
+.filterInput {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 5;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text);
+  font-size: 11px;
+  padding: 5px 10px;
+  width: 170px;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: border-color 0.15s;
+}
+.filterInput::placeholder { color: var(--color-text-muted); }
+.filterInput:focus { border-color: var(--color-accent); }
+
+/* ── Playback bar ────────────────────────────────────────────── */
+.playbackBar {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  white-space: nowrap;
+}
+
+.playbackTitle {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 4px;
+}
+
+.playbackStep {
+  font-size: 11px;
+  color: var(--color-text);
+  font-family: 'Courier New', monospace;
+  min-width: 48px;
+  text-align: center;
+}
+
+.pbBtn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 13px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.pbBtn:hover { background: var(--color-surface-2); border-color: var(--color-accent); }
+.pbBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.pbClose {
+  color: var(--color-text-muted);
+  margin-left: 4px;
+}
+.pbClose:hover { color: var(--color-reject); border-color: var(--color-reject); }

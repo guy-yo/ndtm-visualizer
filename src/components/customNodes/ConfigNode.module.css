@@ -89,6 +89,18 @@
   min-height: 44px;
 }
 
+/* Playback highlight: pulsing accent border */
+.playbackHighlight {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5) !important;
+  animation: playbackPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes playbackPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(168, 85, 247, 0.5); }
+  50%       { box-shadow: 0 0 26px rgba(168, 85, 247, 0.85); }
+}
+
 .rejectReason {
   font-size: 9px;
   font-style: italic;

@@ -22,6 +22,8 @@ export interface ConfigNodeData extends Record<string, unknown> {
   loopOriginId: string | null;
   /** Why this node rejected. Null unless status === 'reject'. */
   rejectReason: RejectReason;
+  /** True when this node is on the currently-playing accept-path playback sequence. */
+  isPlaybackHighlight?: boolean;
 }
 
 export interface TransitionEdgeData extends Record<string, unknown> {

@@ -20,13 +20,13 @@ const REJECT_LABELS: Record<string, string> = {
 export function ConfigNode({ data }: NodeProps<ConfigNodeType>) {
   const toggleCollapse = useAppStore((s) => s.toggleCollapse);
   const blankSymbol = useAppStore((s) => s.machine.blankSymbol);
-  const { state, tape, headPosition, status, isOnAcceptPath, isCollapsed, hasChildren, depth, isLoopStart, rejectReason } = data;
+  const { state, tape, headPosition, status, isOnAcceptPath, isCollapsed, hasChildren, depth, isLoopStart, rejectReason, isPlaybackHighlight } = data;
 
   const borderClass = styles[status];
 
   return (
     <div
-      className={`${styles.node} ${borderClass} ${isOnAcceptPath ? styles.acceptPath : ''} ${isLoopStart ? styles.loopStart : ''}`}
+      className={`${styles.node} ${borderClass} ${isOnAcceptPath ? styles.acceptPath : ''} ${isLoopStart ? styles.loopStart : ''} ${isPlaybackHighlight ? styles.playbackHighlight : ''}`}
       onClick={() => hasChildren && toggleCollapse(data.configId)}
       title={hasChildren ? (isCollapsed ? 'Click to expand' : 'Click to collapse') : undefined}
       style={{ cursor: hasChildren ? 'pointer' : 'default' }}

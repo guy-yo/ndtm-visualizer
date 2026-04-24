@@ -1,12 +1,15 @@
 import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { saveMachine, loadMachineFromFile } from '../../utils/machineIO';
+import { copyShareUrl } from '../../utils/shareUrl';
 import styles from './MachineForm.module.css';
 
 export function MachineIOButtons() {
-  const machine = useAppStore((s) => s.machine);
-  const setMachine = useAppStore((s) => s.setMachine);
-  const fileRef = React.useRef<HTMLInputElement>(null);
+  const machine      = useAppStore((s) => s.machine);
+  const inputString  = useAppStore((s) => s.inputString);
+  const setMachine   = useAppStore((s) => s.setMachine);
+  const fileRef      = React.useRef<HTMLInputElement>(null);
+  const [copied, setCopied] = React.useState(false);
 
   async function handleLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -18,6 +21,16 @@ export function MachineIOButtons() {
       alert('Could not load machine: invalid JSON file.');
     }
     e.target.value = '';
+  }
+
+  async function handleShare() {
+    const ok = await copyShareUrl(machine, inputString);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      alert('Could not copy URL — try a modern browser.');
+    }
   }
 
   return (
@@ -35,6 +48,13 @@ export function MachineIOButtons() {
         title="Load machine definition from JSON file"
       >
         Load
+      </button>
+      <button
+        className={styles.ioBtn}
+        onClick={handleShare}
+        title="Copy shareable URL to clipboard"
+      >
+        {copied ? '✓ Copied!' : '🔗 Share'}
       </button>
       <input
         ref={fileRef}

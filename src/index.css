@@ -79,3 +79,30 @@ body {
 .react-flow__edge-label {
   font-size: 10px;
 }
+
+/* ===== Light theme overrides ===== */
+[data-theme="light"] {
+  --color-bg:        #f8fafc;
+  --color-surface:   #ffffff;
+  --color-surface-2: #f1f5f9;
+  --color-input-bg:  #f8fafc;
+  --color-border:    #cbd5e1;
+  --color-text:      #0f172a;
+  --color-text-muted:#64748b;
+  --color-hover:     rgba(0, 0, 0, 0.04);
+  --color-accent-dim: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="light"] .react-flow__controls {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .react-flow__controls-button {
+  background: var(--color-surface) !important;
+  border-bottom-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .react-flow__minimap {
+  background: var(--color-surface) !important;
+}

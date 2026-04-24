@@ -43,7 +43,10 @@ export function useFlowNodes(
   collapsedIds: Set<string>,
   highlightAcceptPath: boolean,
   allTransitions: Transition[],
-  blankSymbol: string
+  blankSymbol: string,
+  stateFilter: string = '',
+  playbackPath: string[] | null = null,
+  playbackIndex: number = 0,
 ): { nodes: Node<ConfigNodeData>[]; edges: Edge<TransitionEdgeData>[] } {
   return useMemo(() => {
     if (!tree) return { nodes: [], edges: [] };
@@ -52,7 +55,7 @@ export function useFlowNodes(
     const visibleIds = collectVisible(tree, collapsedIds);
     const transitionMap = new Map<string, Transition>(allTransitions.map((t) => [t.id, t]));
 
-    // Collect loop-start node IDs: any node referenced as loopOriginId by a LOOP leaf
+    // Collect loop-start node IDs
     const loopStartIds = new Set<string>();
     for (const id of visibleIds) {
       const config = tree.nodes.get(id);
@@ -60,6 +63,14 @@ export function useFlowNodes(
         loopStartIds.add(config.loopOriginId);
       }
     }
+
+    // State filter: set of IDs that MATCH the filter (full match, case-insensitive)
+    const filterLower = stateFilter.trim().toLowerCase();
+
+    // Playback: set of highlighted IDs
+    const playbackSet = playbackPath
+      ? new Set(playbackPath.slice(0, playbackIndex + 1))
+      : null;
 
     const rawNodes: Node<ConfigNodeData>[] = [];
     const rawEdges: Edge<TransitionEdgeData>[] = [];
@@ -71,10 +82,15 @@ export function useFlowNodes(
       const hasChildren = config.children.length > 0;
       const isCollapsed = collapsedIds.has(id);
 
+      // Filter dimming: dim nodes whose state doesn't match the filter
+      const matchesFilter = !filterLower || config.state.toLowerCase().includes(filterLower);
+      // Playback highlight
+      const isPlaybackHighlight = playbackSet ? playbackSet.has(id) : false;
+
       rawNodes.push({
         id: config.id,
         type: 'configNode',
-        position: { x: 0, y: 0 }, // overwritten by layout
+        position: { x: 0, y: 0 },
         data: {
           configId: config.id,
           state: config.state,
@@ -89,8 +105,12 @@ export function useFlowNodes(
           isLoopStart: loopStartIds.has(id),
           loopOriginId: config.loopOriginId,
           rejectReason: config.rejectReason,
+          isPlaybackHighlight,
         },
         draggable: false,
+        style: (!filterLower || matchesFilter)
+          ? {}
+          : { opacity: 0.12 },
       });
 
       // Tree edge (parent → child)
@@ -98,6 +118,7 @@ export function useFlowNodes(
         const t = config.transitionUsed ? transitionMap.get(config.transitionUsed) : null;
         const label = t ? formatTransitionLabel(t, blankSymbol) : '';
         const isOnPath = acceptSet.has(id) && acceptSet.has(config.parentId);
+        const edgeDimmed = filterLower && !matchesFilter;
 
         rawEdges.push({
           id: `${config.parentId}->${config.id}`,
@@ -111,6 +132,7 @@ export function useFlowNodes(
           style: {
             stroke: isOnPath ? 'var(--color-accept)' : '#475569',
             strokeWidth: isOnPath ? 2.5 : 1.5,
+            opacity: edgeDimmed ? 0.12 : 1,
           },
           data: {
             transitionId: t?.id ?? null,
@@ -124,10 +146,10 @@ export function useFlowNodes(
       }
     }
 
-    // Run dagre layout on tree edges only
+    // Run dagre layout
     const { nodes, edges } = getLayoutedElements(rawNodes, rawEdges, 'TB');
 
-    // Add loop back-edges after layout (decorative — not part of dagre graph)
+    // Add loop back-edges after layout
     const backEdges: Edge<TransitionEdgeData>[] = [];
     for (const id of visibleIds) {
       const config = tree.nodes.get(id);
@@ -150,5 +172,5 @@ export function useFlowNodes(
     }
 
     return { nodes, edges: [...edges, ...backEdges] };
-  }, [tree, collapsedIds, highlightAcceptPath, allTransitions, blankSymbol]);
+  }, [tree, collapsedIds, highlightAcceptPath, allTransitions, blankSymbol, stateFilter, playbackPath, playbackIndex]);
 }
