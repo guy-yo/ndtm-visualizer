@@ -60,13 +60,18 @@ export function TransitionRow({ transition, fromStates, availableStates, availab
         </select>
       </td>
       <td>
-        <select
-          className={`${styles.sel} ${styles.move}`}
-          value={transition.move}
-          onChange={(e) => onUpdate({ move: e.target.value as MoveDirection })}
-        >
-          {MOVES.map((m) => <option key={m}>{m}</option>)}
-        </select>
+        <div className={styles.moveGroup}>
+          {MOVES.map((m) => (
+            <button
+              key={m}
+              className={`${styles.moveBtn} ${transition.move === m ? styles.moveBtnActive : ''}`}
+              onClick={() => onUpdate({ move: m as MoveDirection })}
+              title={{ L: 'Move Left', R: 'Move Right', S: 'Stay' }[m]}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
       </td>
       <td>
         <button className={styles.remove} onClick={onRemove} title="Remove transition">

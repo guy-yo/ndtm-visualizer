@@ -73,13 +73,13 @@
 }
 
 /* Column widths — fixed so nothing overflows */
-.table colgroup col:nth-child(1) { width: 22%; } /* FROM  */
-.table colgroup col:nth-child(2) { width: 19%; } /* READ  */
-.table colgroup col:nth-child(3) { width: 5%;  } /* →     */
-.table colgroup col:nth-child(4) { width: 22%; } /* TO    */
-.table colgroup col:nth-child(5) { width: 19%; } /* WRITE */
-.table colgroup col:nth-child(6) { width: 8%;  } /* MOVE  */
-.table colgroup col:nth-child(7) { width: 5%;  } /* ×     */
+.table colgroup col:nth-child(1) { width: 21%; } /* FROM  */
+.table colgroup col:nth-child(2) { width: 16%; } /* READ  */
+.table colgroup col:nth-child(3) { width: 4%;  } /* →     */
+.table colgroup col:nth-child(4) { width: 21%; } /* TO    */
+.table colgroup col:nth-child(5) { width: 16%; } /* WRITE */
+.table colgroup col:nth-child(6) { width: 16%; } /* MOVE  */
+.table colgroup col:nth-child(7) { width: 6%;  } /* ×     */
 
 .table th {
   background: var(--color-surface-2);

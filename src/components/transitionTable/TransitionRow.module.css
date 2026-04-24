@@ -35,6 +35,37 @@
   user-select: none;
 }
 
+.moveGroup {
+  display: flex;
+  gap: 2px;
+}
+
+.moveBtn {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-input-bg);
+  color: var(--color-text-muted);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 2px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  text-align: center;
+}
+
+.moveBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.moveBtnActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
 .remove {
   background: none;
   border: none;
