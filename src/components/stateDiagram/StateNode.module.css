@@ -40,6 +40,37 @@
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
 }
 
+/* Inline rename input */
+.editInput {
+  width: 70px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--color-accent);
+  color: var(--color-text);
+  outline: none;
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+
+/* Connection handles — invisible by default, appear on node hover */
+.handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--color-accent) !important;
+  border: 2px solid var(--color-bg) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+  cursor: crosshair;
+}
+
+.circle:hover .handle {
+  opacity: 0.65;
+}
+
 /* Start state: arrow to the left of the circle */
 .startArrow {
   position: absolute;

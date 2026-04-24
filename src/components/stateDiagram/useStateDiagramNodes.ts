@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import dagre from 'dagre';
+import { useNodePositions } from '../../store/useNodePositions';
 import type { Node, Edge } from '@xyflow/react';
 import type { NTMDefinition } from '../../types/machine';
 import type { StateNodeData } from './StateNode';
@@ -88,7 +89,30 @@ export function useStateDiagramNodes(machine: NTMDefinition): {
   nodes: Node<StateNodeData>[];
   edges: Edge[];
 } {
-  return useMemo(() => {
+  const positions = useNodePositions((s) => s.positions);
+
+  // First memo: dagre layout — only re-runs when machine changes
+  const { dagreNodes, edges } = useMemo(() => {
+    const result = computeLayout(machine);
+    return { dagreNodes: result.nodes, edges: result.edges };
+  }, [machine]);
+
+  // Second memo: merge user drag-overrides — cheap, doesn't re-run dagre
+  const nodes = useMemo(() => {
+    return dagreNodes.map((n) => {
+      const override = positions[n.id];
+      return override ? { ...n, position: override } : n;
+    });
+  }, [dagreNodes, positions]);
+
+  return { nodes, edges };
+}
+
+function computeLayout(machine: NTMDefinition): {
+  nodes: Node<StateNodeData>[];
+  edges: Edge[];
+} {
+  return (() => {
     const acceptSet = new Set(machine.acceptStates);
     const rejectSet = new Set(machine.rejectStates);
 
@@ -97,7 +121,7 @@ export function useStateDiagramNodes(machine: NTMDefinition): {
       id: s,
       type: 'stateNode',
       position: { x: 0, y: 0 },
-      draggable: false,
+      draggable: true,
       data: {
         stateName: s,
         isStart: s === machine.startState,
@@ -196,5 +220,5 @@ export function useStateDiagramNodes(machine: NTMDefinition): {
     }
 
     return layoutStateNodes(rawNodes, rawEdges);
-  }, [machine]);
+  })();
 }

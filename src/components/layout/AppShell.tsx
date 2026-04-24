@@ -5,6 +5,8 @@ import { InputStringField } from '../inputString/InputStringField';
 import { ExecutionControls } from '../executionControls/ExecutionControls';
 import { StatsPanel } from '../statsPanel/StatsPanel';
 import { BatchTest } from '../batchTest/BatchTest';
+import { MachineValidation } from '../machineValidation/MachineValidation';
+import { EquivalenceTest } from '../equivalenceTest/EquivalenceTest';
 import { FlowCanvas } from '../flowCanvas/FlowCanvas';
 import { StateDiagram } from '../stateDiagram/StateDiagram';
 import { ShortcutLegend } from './ShortcutLegend';
@@ -49,6 +51,8 @@ export function AppShell() {
         <div className={styles.sidebarScroll}>
           <MachineForm />
           <div className={styles.divider} />
+          <MachineValidation />
+          <div className={styles.divider} />
           <TransitionTable />
           <div className={styles.divider} />
           <InputStringField />
@@ -58,6 +62,8 @@ export function AppShell() {
           <StatsPanel />
           <div className={styles.divider} />
           <BatchTest />
+          <div className={styles.divider} />
+          <EquivalenceTest />
         </div>
       </aside>
       <main className={styles.canvas}>

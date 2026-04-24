@@ -104,7 +104,9 @@ interface AppState {
 
   // Machine definition actions
   setMachine: (partial: Partial<NTMDefinition>) => void;
+  renameState: (oldName: string, newName: string) => void;
   addTransition: () => void;
+  addTransitionDirect: (fields: Omit<Transition, 'id'>) => void;
   updateTransition: (id: string, partial: Partial<Omit<Transition, 'id'>>) => void;
   removeTransition: (id: string) => void;
   clearTransitions: () => void;
@@ -244,6 +246,47 @@ export const useAppStore = create<AppState>()(
       const snap = snapshotMachine(get().machine);
       set((state) => {
         Object.assign(state.machine, partial);
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    renameState: (oldName, newName) => {
+      const trimmed = newName.trim();
+      if (!trimmed || trimmed === oldName) return;
+      if (get().machine.states.includes(trimmed)) return; // duplicate name
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        state.machine.states       = state.machine.states.map((s)       => s === oldName ? trimmed : s);
+        state.machine.acceptStates = state.machine.acceptStates.map((s) => s === oldName ? trimmed : s);
+        state.machine.rejectStates = state.machine.rejectStates.map((s) => s === oldName ? trimmed : s);
+        if (state.machine.startState === oldName) state.machine.startState = trimmed;
+        for (const t of state.machine.transitions) {
+          if (t.fromState === oldName) t.fromState = trimmed;
+          if (t.toState   === oldName) t.toState   = trimmed;
+        }
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    addTransitionDirect: (fields) => {
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        const t: Transition = { id: uuidv4(), ...fields };
+        state.machine.transitions.push(t);
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
         state.tree = null;
         state.bfsQueue = [];
