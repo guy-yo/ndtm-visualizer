@@ -15,7 +15,7 @@ function symLabel(sym: string, blank: string) {
   return sym === blank ? '⊔' : sym;
 }
 
-const MOVES: MoveDirection[] = ['L', 'R', 'S'];
+const MOVES: MoveDirection[] = ['L', 'S', 'R'];
 
 export function TransitionRow({ transition, fromStates, availableStates, availableSymbols, blankSymbol, onUpdate, onRemove }: Props) {
   return (
