@@ -136,8 +136,6 @@ export function StateDiagram() {
 
   // Left-click an edge → open edit modal (1 transition) or context menu (many)
   function handleEdgeClick(e: React.MouseEvent, edge: Edge) {
-    // Self-loops: left-click does nothing; right-click still opens context menu
-    if (edge.type === 'selfLoop') return;
     const key = edge.id.startsWith('edge-') ? edge.id.slice(5) : edge.id;
     const [from, to] = key.split('|||');
     const transitions = machine.transitions.filter(

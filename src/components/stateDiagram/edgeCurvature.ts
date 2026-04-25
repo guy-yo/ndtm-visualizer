@@ -55,14 +55,10 @@ export function computeEdgeCurvature(
   const dy  = ey - sy;
   const len = Math.hypot(dx, dy) || 1;
 
-  if (hasMirror) {
-    // Bidirectional pair: proportional arc so it looks balanced at any distance.
-    // Minimum 40 px so very close nodes are still visually distinct.
-    return Math.max(40, len * 0.18);
-  }
-
   // Single-direction edge: stay straight unless another node blocks the path.
-  let best = 0;
+  // Bidirectional pair: start from the proportional base arc, then grow further
+  // if a blocking node sits between the two states.
+  let best = hasMirror ? Math.max(40, len * 0.18) : 0;
 
   for (const node of others) {
     // Projection parameter t of the closest chord point to this node (clamped
@@ -85,7 +81,13 @@ export function computeEdgeCurvature(
       const cross     = dx * (node.cy - sy) - dy * (node.cx - sx);
       const candidate = (cross >= 0 ? 1 : -1) * needed;
 
-      if (Math.abs(candidate) > Math.abs(best)) best = candidate;
+      if (hasMirror) {
+        // Bidirectional arcs always curve in the positive direction; only grow,
+        // never shrink below the base value.
+        if (candidate > best) best = candidate;
+      } else {
+        if (Math.abs(candidate) > Math.abs(best)) best = candidate;
+      }
     }
   }
 

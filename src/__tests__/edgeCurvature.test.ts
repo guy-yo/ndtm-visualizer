@@ -99,6 +99,34 @@ describe('computeEdgeCurvature', () => {
     expect(Math.abs(cMulti)).toBeGreaterThanOrEqual(Math.abs(cSingle));
   });
 
+  // ── Bidirectional + blocking node ────────────────────────────────────────
+  it('bidirectional arc grows beyond base when a node sits between the pair', () => {
+    // Edge (0,0)→(300,0); base = max(40, 300*0.18) = 54
+    // Blocking node at (150, 5) — very close to chord, needs large curvature
+    const blocker = node('b', 150, 5);
+    const cMirror   = computeEdgeCurvature(0, 0, 300, 0, true,  [blocker]);
+    const cNoBlock  = computeEdgeCurvature(0, 0, 300, 0, true,  []);
+    // With the blocker it must be strictly larger than without
+    expect(cMirror).toBeGreaterThan(cNoBlock);
+  });
+
+  it('bidirectional arc never shrinks below base for far-away blocking node', () => {
+    // Node far to the right side but outside CLEARANCE — no effect expected
+    const farRight = node('f', 150, 500);
+    const cBase  = computeEdgeCurvature(0, 0, 300, 0, true, []);
+    const cFar   = computeEdgeCurvature(0, 0, 300, 0, true, [farRight]);
+    expect(cFar).toBe(cBase);
+  });
+
+  it('bidirectional arc remains positive even with node on LEFT side', () => {
+    // Node above chord (LEFT of rightward edge) — cross < 0 → candidate negative.
+    // For bidirectional we only grow in the positive direction; result stays >= base.
+    const leftBlocker = node('l', 150, -5);
+    const cBase = computeEdgeCurvature(0, 0, 300, 0, true, []);
+    const c     = computeEdgeCurvature(0, 0, 300, 0, true, [leftBlocker]);
+    expect(c).toBeGreaterThanOrEqual(cBase);
+  });
+
   // ── NODE_RADIUS is exported ───────────────────────────────────────────────
   it('exports NODE_RADIUS = 40', () => {
     expect(NODE_RADIUS).toBe(40);
