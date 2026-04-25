@@ -134,9 +134,9 @@ export function StateDiagram() {
     setEditTrans(null);
   }
 
-  // Left-click an edge → open edit modal for that transition's arc
-  function handleEdgeClick(_: React.MouseEvent, edge: Edge) {
-    // Self-loops are handled differently — open via context menu
+  // Left-click an edge → open edit modal (1 transition) or context menu (many)
+  function handleEdgeClick(e: React.MouseEvent, edge: Edge) {
+    // Self-loops: left-click does nothing; right-click still opens context menu
     if (edge.type === 'selfLoop') return;
     const key = edge.id.startsWith('edge-') ? edge.id.slice(5) : edge.id;
     const [from, to] = key.split('|||');
@@ -148,8 +148,8 @@ export function StateDiagram() {
       const t = transitions[0];
       setEditTrans({ from, to, t: { id: t.id, readSymbol: t.readSymbol, writeSymbol: t.writeSymbol, move: t.move } });
     } else {
-      // Multiple transitions on this arc: show context menu so user can pick
-      setCtxMenu({ kind: 'edge', x: 0, y: 0, transitions, blankSymbol: machine.blankSymbol });
+      // Multiple transitions on this arc: show pick menu at the click position
+      setCtxMenu({ kind: 'edge', x: e.clientX, y: e.clientY, transitions, blankSymbol: machine.blankSymbol });
     }
   }
 
