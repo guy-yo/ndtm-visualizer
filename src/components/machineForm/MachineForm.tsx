@@ -6,9 +6,15 @@ import { MachineIOButtons } from './MachineIOButtons';
 import styles from './MachineForm.module.css';
 
 export function MachineForm() {
-  const machine = useAppStore((s) => s.machine);
-  const errors = useAppStore((s) => s.machineErrors);
-  const setMachine = useAppStore((s) => s.setMachine);
+  const machine          = useAppStore((s) => s.machine);
+  const errors           = useAppStore((s) => s.machineErrors);
+  const setMachine       = useAppStore((s) => s.setMachine);
+  const currentMachineId = useAppStore((s) => s.currentMachineId);
+  const savedMachines    = useAppStore((s) => s.savedMachines);
+
+  const currentName = currentMachineId
+    ? (savedMachines.find((m) => m.id === currentMachineId)?.name ?? null)
+    : null;
 
   function errFor(field: string) {
     return errors.find((e) => e.field === field)?.message;
@@ -25,7 +31,12 @@ export function MachineForm() {
   return (
     <section className={styles.section}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.title}>Machine Definition</h2>
+        <div className={styles.titleBlock}>
+          <h2 className={styles.title}>Machine Definition</h2>
+          {currentName && (
+            <span className={styles.currentMachineName}>{currentName}</span>
+          )}
+        </div>
         <div className={styles.headerActions}>
           <ExamplesDropdown />
           <MyMachinesDropdown />

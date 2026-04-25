@@ -145,9 +145,10 @@ interface AppState {
   redo: () => void;
 
   // Saved-machine library
-  savedMachines:      SavedMachine[];
-  saveMachineAs:      (name: string) => void;
-  loadLibraryMachine: (id: string) => void;
+  savedMachines:       SavedMachine[];
+  currentMachineId:    string | null;  // ID of the library entry being edited
+  saveMachineAs:       (name: string) => void;
+  loadLibraryMachine:  (id: string) => void;
   deleteLibraryMachine:(id: string) => void;
 
   // Machine definition actions
@@ -218,7 +219,8 @@ export const useAppStore = create<AppState>()(
     isPlaybackPlaying: false,
 
     // Machine library
-    savedMachines: loadLibrary(),
+    savedMachines:    loadLibrary(),
+    currentMachineId: null,
 
     // Feature 12
     undoStack: [],
@@ -439,14 +441,16 @@ export const useAppStore = create<AppState>()(
 
     // ── Machine library ───────────────────────────────────────────────────────
     saveMachineAs: (name) => {
+      const id = uuidv4();
       const entry: SavedMachine = {
-        id:      uuidv4(),
+        id,
         name:    name.trim(),
         machine: snapshotMachine(get().machine),
         savedAt: Date.now(),
       };
       set((state) => {
-        (state as unknown as AppState).savedMachines = [entry, ...(state as unknown as AppState).savedMachines];
+        (state as unknown as AppState).savedMachines    = [entry, ...(state as unknown as AppState).savedMachines];
+        (state as unknown as AppState).currentMachineId = id;
         persistLibrary((state as unknown as AppState).savedMachines);
       });
     },
@@ -465,6 +469,7 @@ export const useAppStore = create<AppState>()(
         state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
         state.redoStack        = [];
         state.treeHistory      = [];
+        (state as unknown as AppState).currentMachineId = id;
       });
     },
 
@@ -472,6 +477,9 @@ export const useAppStore = create<AppState>()(
       set((state) => {
         const next = (state as unknown as AppState).savedMachines.filter((m) => m.id !== id);
         (state as unknown as AppState).savedMachines = next;
+        if ((state as unknown as AppState).currentMachineId === id) {
+          (state as unknown as AppState).currentMachineId = null;
+        }
         persistLibrary(next);
       });
     },
@@ -501,6 +509,7 @@ export const useAppStore = create<AppState>()(
         state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
         state.redoStack        = [];
         state.treeHistory      = [];
+        (state as unknown as AppState).currentMachineId = null;
       });
     },
 
@@ -735,9 +744,24 @@ export const useAppStore = create<AppState>()(
   }))
 );
 
-// ── Auto-save machine to localStorage on every machine change ─────────────────
+// ── Auto-save machine to localStorage + library entry on every change ─────────
 useAppStore.subscribe((state, prev) => {
-  if (state.machine !== prev.machine) {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state.machine)); } catch { /* ignore */ }
-  }
+  if (state.machine === prev.machine) return;
+
+  // 1. Always persist the current working machine
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state.machine)); } catch { /* ignore */ }
+
+  // 2. If a named library entry is active, update it in-place
+  const id = state.currentMachineId;
+  if (!id) return;
+
+  const updated = state.savedMachines.map((m) =>
+    m.id === id
+      ? { ...m, machine: JSON.parse(JSON.stringify(state.machine)), savedAt: Date.now() }
+      : m,
+  );
+
+  persistLibrary(updated);
+  // Update store without touching `machine` (prevents infinite loop)
+  useAppStore.setState({ savedMachines: updated });
 });

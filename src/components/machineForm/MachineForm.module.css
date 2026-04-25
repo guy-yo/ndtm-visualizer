@@ -13,6 +13,24 @@
   gap: 8px;
 }
 
+/* Title + optional machine name stacked vertically */
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.currentMachineName {
+  font-size: 10px;
+  color: var(--color-accent);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
 
 .headerActions {
   display: flex;
@@ -64,9 +82,40 @@
   transition: color 0.15s, border-color 0.15s;
 }
 
-.ioBtn:hover {
+.ioBtn:hover:not(:disabled) {
   color: var(--color-text);
   border-color: var(--color-accent);
+}
+
+.ioBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Thin vertical separator between undo/redo and the rest */
+.ioDivider {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--color-border);
+  margin: 0 2px;
+  align-self: center;
+}
+
+/* "✓ Saved" flash indicator */
+.savedFlash {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-accept, #22c55e);
+  animation: fadeOut 1.8s ease forwards;
+  white-space: nowrap;
+  align-self: center;
+}
+
+@keyframes fadeOut {
+  0%   { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .ioBtnNew {
