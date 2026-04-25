@@ -3,7 +3,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
   BackgroundVariant,
   useReactFlow,
 } from '@xyflow/react';
@@ -12,7 +11,6 @@ import { useAppStore } from '../../store/useAppStore';
 import { nodeTypes } from '../customNodes/ConfigNode';
 import { useFlowNodes } from './useFlowNodes';
 import { ExportButton } from './ExportButton';
-import type { NodeStatus } from '../../types/engine';
 import styles from './FlowCanvas.module.css';
 
 // ── Auto-focus: inside ReactFlow context, pans to the next BFS node ──────────
@@ -102,12 +100,6 @@ function PlaybackBar() {
   );
 }
 
-const STATUS_COLORS: Record<NodeStatus, string> = {
-  running: '#3b82f6',
-  accept:  '#22c55e',
-  reject:  '#ef4444',
-  loop:    '#6b7280',
-};
 
 export function FlowCanvas() {
   const canvasRef     = React.useRef<HTMLDivElement>(null);
@@ -218,15 +210,6 @@ export function FlowCanvas() {
           color="#334155"
         />
         <Controls />
-        <MiniMap
-          nodeColor={(node) => {
-            const status = (node.data as { status: NodeStatus })?.status;
-            return STATUS_COLORS[status] ?? '#94a3b8';
-          }}
-          nodeStrokeWidth={0}
-          style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
-          maskColor="rgba(0, 0, 0, 0.25)"
-        />
       </ReactFlow>
     </div>
   );
