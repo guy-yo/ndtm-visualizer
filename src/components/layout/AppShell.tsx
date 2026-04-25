@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { MachineForm } from '../machineForm/MachineForm';
 import { TransitionTable } from '../transitionTable/TransitionTable';
@@ -6,7 +7,6 @@ import { ExecutionControls } from '../executionControls/ExecutionControls';
 import { StatsPanel } from '../statsPanel/StatsPanel';
 import { BatchTest } from '../batchTest/BatchTest';
 import { MachineValidation } from '../machineValidation/MachineValidation';
-import { EquivalenceTest } from '../equivalenceTest/EquivalenceTest';
 import { FlowCanvas } from '../flowCanvas/FlowCanvas';
 import { StateDiagram } from '../stateDiagram/StateDiagram';
 import { ShortcutLegend } from './ShortcutLegend';
@@ -20,9 +20,11 @@ export function AppShell() {
   const setTheme = useAppStore((s) => s.setTheme);
   const isIdle   = phase === 'idle';
 
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${sidebarOpen ? '' : styles.sidebarCollapsed}`}>
         <div className={styles.sidebarHeader}>
           <div className={styles.headerRow}>
             <div>
@@ -62,11 +64,19 @@ export function AppShell() {
           <StatsPanel />
           <div className={styles.divider} />
           <BatchTest />
-          <div className={styles.divider} />
-          <EquivalenceTest />
         </div>
       </aside>
       <main className={styles.canvas}>
+        {/* Sidebar collapse/expand tab */}
+        <button
+          className={styles.sidebarToggle}
+          onClick={() => setSidebarOpen((o) => !o)}
+          title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+          aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+        >
+          {sidebarOpen ? '◄' : '►'}
+        </button>
+
         {/* View mode toggle — pill tabs at top-center of canvas */}
         <div className={styles.canvasToolbar}>
           <button

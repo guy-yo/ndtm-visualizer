@@ -23,6 +23,24 @@ import {
 } from '../engine/ntmEngine';
 import { EXAMPLE_MACHINE, EXAMPLE_INPUT } from './exampleMachine';
 
+// ── localStorage persistence ──────────────────────────────────────────────────
+const LS_KEY = 'ndtm-machine-v1';
+
+function loadSavedMachine(): NTMDefinition | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as NTMDefinition;
+    // Sanity-check required fields
+    if (
+      Array.isArray(parsed.states) &&
+      Array.isArray(parsed.transitions) &&
+      typeof parsed.startState === 'string'
+    ) return parsed;
+  } catch { /* ignore */ }
+  return null;
+}
+
 // ── Deep-clone helpers for step-backward snapshots ────────────────────────────
 function cloneConfig(c: NTMConfig): NTMConfig {
   return { ...c, tape: new Map(c.tape), children: [...c.children] };
@@ -103,7 +121,13 @@ interface AppState {
   redo: () => void;
 
   // Machine definition actions
+  newMachine: () => void;
   setMachine: (partial: Partial<NTMDefinition>) => void;
+  addState: (name: string) => void;
+  removeState: (name: string) => void;
+  setStartState: (name: string) => void;
+  toggleAcceptState: (name: string) => void;
+  toggleRejectState: (name: string) => void;
   renameState: (oldName: string, newName: string) => void;
   addTransition: () => void;
   addTransitionDirect: (fields: Omit<Transition, 'id'>) => void;
@@ -135,7 +159,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   immer((set, get) => ({
-    machine: EXAMPLE_MACHINE,
+    machine: loadSavedMachine() ?? EXAMPLE_MACHINE,
     machineErrors: [],
     inputString: EXAMPLE_INPUT,
     executionPhase: 'idle',
@@ -246,6 +270,16 @@ export const useAppStore = create<AppState>()(
       const snap = snapshotMachine(get().machine);
       set((state) => {
         Object.assign(state.machine, partial);
+        // Auto-sync: every input-alphabet symbol must also be in the tape alphabet
+        if (partial.inputAlphabet !== undefined) {
+          const tapeSet = new Set(state.machine.tapeAlphabet);
+          for (const sym of state.machine.inputAlphabet) {
+            if (!tapeSet.has(sym)) {
+              state.machine.tapeAlphabet.push(sym);
+              tapeSet.add(sym);
+            }
+          }
+        }
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
         state.tree = null;
         state.bfsQueue = [];
@@ -359,6 +393,135 @@ export const useAppStore = create<AppState>()(
       const snap = snapshotMachine(get().machine);
       set((state) => {
         state.machine.transitions = [];
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    // ── New blank machine ─────────────────────────────────────────────────────
+    newMachine: () => {
+      const snap = snapshotMachine(get().machine);
+      const blankSym = get().machine.blankSymbol;
+      const blank: NTMDefinition = {
+        states:        ['q0', 'qacc', 'qrej'],
+        inputAlphabet: [],
+        tapeAlphabet:  [blankSym],
+        startState:    'q0',
+        acceptStates:  ['qacc'],
+        rejectStates:  ['qrej'],
+        blankSymbol:   blankSym,
+        transitions:   [],
+      };
+      set((state) => {
+        Object.assign(state.machine, blank);
+        state.machineErrors    = validateMachine(blank);
+        state.inputString      = '';
+        state.tree             = null;
+        state.bfsQueue         = [];
+        state.executionPhase   = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack        = [];
+        state.treeHistory      = [];
+      });
+    },
+
+    // ── Visual diagram editing ────────────────────────────────────────────────
+    addState: (name) => {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      if (get().machine.states.includes(trimmed)) return;
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        state.machine.states.push(trimmed);
+        // Auto-set as start state if no start state yet
+        if (!state.machine.startState) state.machine.startState = trimmed;
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    removeState: (name) => {
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        state.machine.states       = state.machine.states.filter((s)       => s !== name);
+        state.machine.acceptStates = state.machine.acceptStates.filter((s) => s !== name);
+        state.machine.rejectStates = state.machine.rejectStates.filter((s) => s !== name);
+        state.machine.transitions  = state.machine.transitions.filter(
+          (t) => t.fromState !== name && t.toState !== name,
+        );
+        if (state.machine.startState === name) {
+          state.machine.startState = state.machine.states[0] ?? '';
+        }
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    setStartState: (name) => {
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        state.machine.startState = name;
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    toggleAcceptState: (name) => {
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        const isAccept = state.machine.acceptStates.includes(name);
+        if (isAccept) {
+          state.machine.acceptStates = state.machine.acceptStates.filter((s) => s !== name);
+        } else {
+          state.machine.acceptStates.push(name);
+          state.machine.rejectStates = state.machine.rejectStates.filter((s) => s !== name);
+        }
+        state.machineErrors = validateMachine(state.machine as NTMDefinition);
+        state.tree = null;
+        state.bfsQueue = [];
+        state.executionPhase = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack = [];
+        state.treeHistory = [];
+      });
+    },
+
+    toggleRejectState: (name) => {
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        const isReject = state.machine.rejectStates.includes(name);
+        if (isReject) {
+          state.machine.rejectStates = state.machine.rejectStates.filter((s) => s !== name);
+        } else {
+          state.machine.rejectStates.push(name);
+          state.machine.acceptStates = state.machine.acceptStates.filter((s) => s !== name);
+        }
         state.machineErrors = validateMachine(state.machine as NTMDefinition);
         state.tree = null;
         state.bfsQueue = [];
@@ -499,3 +662,10 @@ export const useAppStore = create<AppState>()(
     setRfEdges: (edges) => set((state) => { state.rfEdges = edges as unknown as typeof state.rfEdges; }),
   }))
 );
+
+// ── Auto-save machine to localStorage on every machine change ─────────────────
+useAppStore.subscribe((state, prev) => {
+  if (state.machine !== prev.machine) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state.machine)); } catch { /* ignore */ }
+  }
+});

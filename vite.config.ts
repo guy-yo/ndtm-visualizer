@@ -10,4 +10,10 @@ export default defineConfig({
     // Bundle immer separately so setAutoFreeze is accessible as a named export
     include: ['immer'],
   },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: ['src/__tests__/setup.ts'],
+    include: ['src/**/*.test.ts'],
+  },
 })

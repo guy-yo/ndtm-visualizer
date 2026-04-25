@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { SettingsToggles } from './SettingsToggles';
 import { LimitInputs } from './LimitInputs';
@@ -14,8 +15,9 @@ export function ExecutionControls() {
   const stepBack       = useAppStore((s) => s.stepBack);
   const resetExecution = useAppStore((s) => s.resetExecution);
 
+  const [isOpen, setIsOpen] = React.useState(true);
+
   const hasErrors  = errors.length > 0;
-  const isIdle     = phase === 'idle' || phase === 'complete';
   const isStepping = phase === 'stepping';
   const isRunning  = phase === 'running';
   const queueEmpty = bfsQueue.length === 0;
@@ -23,8 +25,15 @@ export function ExecutionControls() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Execution</h2>
+      <div className={styles.sectionHeader}>
+        <button className={styles.collapseBtn} onClick={() => setIsOpen((o) => !o)}>
+          <span className={styles.chevron}>{isOpen ? '▾' : '▸'}</span>
+          <h2 className={styles.title}>Execution</h2>
+        </button>
+      </div>
 
+      {isOpen && (
+        <>
       <SettingsToggles />
       <LimitInputs />
 
@@ -92,6 +101,8 @@ export function ExecutionControls() {
             <div key={i} className={styles.errorItem}>⚠ {e.message}</div>
           ))}
         </div>
+      )}
+        </>
       )}
     </section>
   );

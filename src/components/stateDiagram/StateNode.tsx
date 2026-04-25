@@ -69,12 +69,17 @@ export function StateNode({ data }: NodeProps<StateNodeType>) {
         <span className={styles.label} title="Double-click to rename">{stateName}</span>
       )}
 
-      {/* Normal edges: enter from left, exit from right (visible on hover for connecting) */}
+      {/* Incoming connections always allowed */}
       <Handle type="target" position={Position.Left}  className={styles.handle} />
-      <Handle type="source" position={Position.Right} className={styles.handle} />
-      {/* Self-loop handles: invisible positioning anchors on the top edge */}
-      <Handle type="source" id="self-out" position={Position.Top} style={{ left: '28%', opacity: 0, pointerEvents: 'none' }} />
       <Handle type="target" id="self-in"  position={Position.Top} style={{ left: '72%', opacity: 0, pointerEvents: 'none' }} />
+
+      {/* Outgoing connections only for non-terminal states */}
+      {!isAccept && !isReject && (
+        <>
+          <Handle type="source" position={Position.Right} className={styles.handle} />
+          <Handle type="source" id="self-out" position={Position.Top} style={{ left: '28%', opacity: 0, pointerEvents: 'none' }} />
+        </>
+      )}
     </div>
   );
 }

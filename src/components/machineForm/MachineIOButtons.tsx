@@ -8,6 +8,7 @@ export function MachineIOButtons() {
   const machine      = useAppStore((s) => s.machine);
   const inputString  = useAppStore((s) => s.inputString);
   const setMachine   = useAppStore((s) => s.setMachine);
+  const newMachine   = useAppStore((s) => s.newMachine);
   const fileRef      = React.useRef<HTMLInputElement>(null);
   const [copied, setCopied] = React.useState(false);
 
@@ -35,6 +36,17 @@ export function MachineIOButtons() {
 
   return (
     <div className={styles.ioButtons}>
+      <button
+        className={`${styles.ioBtn} ${styles.ioBtnNew}`}
+        onClick={() => {
+          if (confirm('Create a blank machine? This will clear the current machine (undoable with Ctrl+Z).')) {
+            newMachine();
+          }
+        }}
+        title="Start with a blank machine (qacc + qrej states)"
+      >
+        New
+      </button>
       <button
         className={styles.ioBtn}
         onClick={() => saveMachine(machine)}

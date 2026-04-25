@@ -3,11 +3,24 @@ import ReactDOM from 'react-dom';
 import type { MoveDirection, NTMDefinition } from '../../types/machine';
 import styles from './AddTransitionModal.module.css';
 
+// ── Minimal transition fields needed for editing ──────────────────────────────
+export interface EditableTransition {
+  id: string;
+  readSymbol: string;
+  writeSymbol: string;
+  move: MoveDirection;
+}
+
 interface Props {
-  fromState: string;
-  toState: string;
+  /** Pre-selected "from" state. null = show dropdown (free mode). */
+  fromState: string | null;
+  /** Pre-selected "to" state. null = show dropdown (free mode). */
+  toState: string | null;
   machine: NTMDefinition;
-  onAdd: (read: string, write: string, move: MoveDirection) => void;
+  /** When provided the modal opens in edit mode (pre-filled, Save button). */
+  editTransition?: EditableTransition | null;
+  onAdd:  (from: string, to: string, read: string, write: string, move: MoveDirection) => void;
+  onEdit?: (id: string, read: string, write: string, move: MoveDirection) => void;
   onClose: () => void;
 }
 
@@ -17,14 +30,44 @@ function symLabel(sym: string, blank: string) {
   return sym === blank ? '⊔' : sym;
 }
 
-export function AddTransitionModal({ fromState, toState, machine, onAdd, onClose }: Props) {
-  const { tapeAlphabet, blankSymbol } = machine;
+export function AddTransitionModal({
+  fromState,
+  toState,
+  machine,
+  editTransition,
+  onAdd,
+  onEdit,
+  onClose,
+}: Props) {
+  const { tapeAlphabet, blankSymbol, states, acceptStates, rejectStates } = machine;
 
-  const [read,  setRead]  = React.useState<string>(tapeAlphabet[0] ?? '');
-  const [write, setWrite] = React.useState<string>(tapeAlphabet[0] ?? '');
-  const [move,  setMove]  = React.useState<MoveDirection>('R');
+  // States that may be the SOURCE of a transition (not terminal)
+  const nonTerminalStates = states.filter(
+    (s) => !acceptStates.includes(s) && !rejectStates.includes(s),
+  );
 
-  // Close on Escape key
+  const isEditMode = !!editTransition;
+
+  // From / To — mutable even when pre-set from the drag gesture
+  const [selFrom, setSelFrom] = React.useState<string>(
+    fromState ?? nonTerminalStates[0] ?? states[0] ?? '',
+  );
+  const [selTo, setSelTo] = React.useState<string>(
+    toState ?? states[0] ?? '',
+  );
+
+  // Read / Write / Move
+  const [read,  setRead]  = React.useState<string>(
+    editTransition?.readSymbol  ?? tapeAlphabet[0] ?? '',
+  );
+  const [write, setWrite] = React.useState<string>(
+    editTransition?.writeSymbol ?? tapeAlphabet[0] ?? '',
+  );
+  const [move,  setMove]  = React.useState<MoveDirection>(
+    editTransition?.move ?? 'R',
+  );
+
+  // Close on Escape
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -37,22 +80,63 @@ export function AddTransitionModal({ fromState, toState, machine, onAdd, onClose
     if (e.target === e.currentTarget) onClose();
   }
 
-  function handleAdd() {
-    onAdd(read, write, move);
+  function handleConfirm() {
+    if (isEditMode && editTransition && onEdit) {
+      onEdit(editTransition.id, read, write, move);
+    } else {
+      onAdd(selFrom, selTo, read, write, move);
+    }
   }
+
+  const title = isEditMode ? 'Edit Transition' : 'Add Transition';
+  const confirmLabel = isEditMode ? 'Save' : 'Add';
 
   return ReactDOM.createPortal(
     <div className={styles.overlay} onMouseDown={handleOverlayClick}>
       <div className={styles.modal}>
-        <p className={styles.title}>Add Transition</p>
+        <p className={styles.title}>{title}</p>
 
-        {/* Route display */}
+        {/* ── Route row ───────────────────────────────────────────── */}
         <div className={styles.route}>
-          <span className={styles.stateLabel}>{fromState}</span>
-          <span className={styles.arrow}>→</span>
-          <span className={styles.stateLabel}>{toState}</span>
+          {isEditMode ? (
+            // Edit mode: fixed labels for from/to
+            <>
+              <span className={styles.stateLabel}>{selFrom}</span>
+              <span className={styles.arrow}>→</span>
+              <span className={styles.stateLabel}>{selTo}</span>
+            </>
+          ) : (
+            // Add mode: dropdowns (pre-selected when from drag gesture)
+            <>
+              <select
+                className={styles.stateSelect}
+                value={selFrom}
+                onChange={(e) => setSelFrom(e.target.value)}
+              >
+                {nonTerminalStates.length > 0
+                  ? nonTerminalStates.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))
+                  : states.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))
+                }
+              </select>
+              <span className={styles.arrow}>→</span>
+              <select
+                className={styles.stateSelect}
+                value={selTo}
+                onChange={(e) => setSelTo(e.target.value)}
+              >
+                {states.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </>
+          )}
         </div>
 
+        {/* ── Fields ─────────────────────────────────────────────── */}
         <div className={styles.fields}>
           {/* Read */}
           <div className={styles.fieldRow}>
@@ -102,9 +186,10 @@ export function AddTransitionModal({ fromState, toState, machine, onAdd, onClose
           </div>
         </div>
 
+        {/* ── Actions ─────────────────────────────────────────────── */}
         <div className={styles.actions}>
           <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-          <button className={styles.addBtn}    onClick={handleAdd}>Add</button>
+          <button className={styles.addBtn} onClick={handleConfirm}>{confirmLabel}</button>
         </div>
       </div>
     </div>,

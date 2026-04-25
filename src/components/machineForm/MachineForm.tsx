@@ -30,6 +30,7 @@ export function MachineForm() {
           <MachineIOButtons />
         </div>
       </div>
+
       <div className={styles.grid}>
 
         <StatesInput

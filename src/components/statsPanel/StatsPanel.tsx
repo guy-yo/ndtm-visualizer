@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import type { NodeStatus } from '../../types/engine';
 import styles from './StatsPanel.module.css';
@@ -122,6 +123,8 @@ export function StatsPanel() {
   const tree  = useAppStore((s) => s.tree);
   const phase = useAppStore((s) => s.executionPhase);
 
+  const [isOpen, setIsOpen] = React.useState(true);
+
   if (!tree && phase === 'idle') return null;
 
   if (phase === 'running') {
@@ -174,42 +177,51 @@ export function StatsPanel() {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Results</h2>
-
-      <div className={`${styles.verdict} ${verdictCls}`}>
-        {verdictText}
+      <div className={styles.sectionHeader}>
+        <button className={styles.collapseBtn} onClick={() => setIsOpen((o) => !o)}>
+          <span className={styles.chevron}>{isOpen ? '▾' : '▸'}</span>
+          <h2 className={styles.title}>Results</h2>
+        </button>
       </div>
 
-      {/* Core stats */}
-      <div className={styles.stats}>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Nodes</span>
-          <span className={styles.statValue}>{totalNodes}</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Max Depth</span>
-          <span className={styles.statValue}>{maxDepth}</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Accept</span>
-          <span className={styles.statValue}>{acceptCount}</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statLabel}>Branch</span>
-          <span className={styles.statValue}>{branchingFactor}</span>
-        </div>
-      </div>
+      {isOpen && (
+        <>
+          <div className={`${styles.verdict} ${verdictCls}`}>
+            {verdictText}
+          </div>
 
-      <div className={styles.reason}>{reasonText}</div>
+          {/* Core stats */}
+          <div className={styles.stats}>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Nodes</span>
+              <span className={styles.statValue}>{totalNodes}</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Max Depth</span>
+              <span className={styles.statValue}>{maxDepth}</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Accept</span>
+              <span className={styles.statValue}>{acceptCount}</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Branch</span>
+              <span className={styles.statValue}>{branchingFactor}</span>
+            </div>
+          </div>
 
-      {/* Per-status breakdown */}
-      <StatusCounts counts={statusCounts} />
+          <div className={styles.reason}>{reasonText}</div>
 
-      {/* Depth histogram */}
-      <DepthHistogram depthCounts={depthCounts} />
+          {/* Per-status breakdown */}
+          <StatusCounts counts={statusCounts} />
 
-      {/* Accept paths (playback) */}
-      <AcceptPaths paths={tree.acceptPaths} />
+          {/* Depth histogram */}
+          <DepthHistogram depthCounts={depthCounts} />
+
+          {/* Accept paths (playback) */}
+          <AcceptPaths paths={tree.acceptPaths} />
+        </>
+      )}
     </section>
   );
 }

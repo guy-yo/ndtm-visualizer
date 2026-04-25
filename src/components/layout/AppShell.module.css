@@ -1,6 +1,5 @@
 .shell {
-  display: grid;
-  grid-template-columns: 390px 1fr;
+  display: flex;
   height: 100vh;
   overflow: hidden;
   background: var(--color-bg);
@@ -12,6 +11,17 @@
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   overflow: hidden;
+  width: 390px;
+  min-width: 390px;
+  flex-shrink: 0;
+  transition: width 0.22s ease, min-width 0.22s ease;
+}
+
+/* Collapsed sidebar — slides fully off-screen */
+.sidebarCollapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  border-right: none;
 }
 
 .sidebarHeader {
@@ -103,9 +113,41 @@
 }
 
 .canvas {
+  flex: 1;
   position: relative;
   overflow: hidden;
   background: var(--color-bg);
+  min-width: 0;
+}
+
+/* Sidebar toggle tab — left edge of canvas */
+.sidebarToggle {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  width: 20px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.sidebarToggle:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border-color: var(--color-accent);
 }
 
 /* View-mode toggle tabs — floating pill at top-center of canvas */

@@ -13,6 +13,7 @@
   gap: 8px;
 }
 
+
 .headerActions {
   display: flex;
   align-items: center;
@@ -66,6 +67,14 @@
 .ioBtn:hover {
   color: var(--color-text);
   border-color: var(--color-accent);
+}
+
+.ioBtnNew {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.ioBtnNew:hover {
+  background: rgba(99, 102, 241, 0.1);
 }
 
 .grid {
