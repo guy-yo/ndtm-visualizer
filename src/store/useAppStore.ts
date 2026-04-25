@@ -23,6 +23,30 @@ import {
 } from '../engine/ntmEngine';
 import { EXAMPLE_MACHINE, EXAMPLE_INPUT } from './exampleMachine';
 
+// ── Saved-machine library ─────────────────────────────────────────────────────
+export interface SavedMachine {
+  id:      string;
+  name:    string;
+  machine: NTMDefinition;
+  savedAt: number; // unix timestamp ms
+}
+
+const LS_LIBRARY_KEY = 'ndtm-machine-library-v1';
+
+function loadLibrary(): SavedMachine[] {
+  try {
+    const raw = localStorage.getItem(LS_LIBRARY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as SavedMachine[];
+  } catch { /* ignore */ }
+  return [];
+}
+
+function persistLibrary(lib: SavedMachine[]): void {
+  try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(lib)); } catch { /* ignore */ }
+}
+
 // ── localStorage persistence ──────────────────────────────────────────────────
 const LS_KEY = 'ndtm-machine-v1';
 
@@ -120,6 +144,12 @@ interface AppState {
   undo: () => void;
   redo: () => void;
 
+  // Saved-machine library
+  savedMachines:      SavedMachine[];
+  saveMachineAs:      (name: string) => void;
+  loadLibraryMachine: (id: string) => void;
+  deleteLibraryMachine:(id: string) => void;
+
   // Machine definition actions
   newMachine: () => void;
   setMachine: (partial: Partial<NTMDefinition>) => void;
@@ -186,6 +216,9 @@ export const useAppStore = create<AppState>()(
     playbackPath: null,
     playbackIndex: 0,
     isPlaybackPlaying: false,
+
+    // Machine library
+    savedMachines: loadLibrary(),
 
     // Feature 12
     undoStack: [],
@@ -401,6 +434,45 @@ export const useAppStore = create<AppState>()(
         state.undoStack = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
         state.redoStack = [];
         state.treeHistory = [];
+      });
+    },
+
+    // ── Machine library ───────────────────────────────────────────────────────
+    saveMachineAs: (name) => {
+      const entry: SavedMachine = {
+        id:      uuidv4(),
+        name:    name.trim(),
+        machine: snapshotMachine(get().machine),
+        savedAt: Date.now(),
+      };
+      set((state) => {
+        (state as unknown as AppState).savedMachines = [entry, ...(state as unknown as AppState).savedMachines];
+        persistLibrary((state as unknown as AppState).savedMachines);
+      });
+    },
+
+    loadLibraryMachine: (id) => {
+      const entry = get().savedMachines.find((m) => m.id === id);
+      if (!entry) return;
+      const snap = snapshotMachine(get().machine);
+      set((state) => {
+        Object.assign(state.machine, snapshotMachine(entry.machine));
+        state.machineErrors    = validateMachine(entry.machine);
+        state.tree             = null;
+        state.bfsQueue         = [];
+        state.executionPhase   = 'idle';
+        state.collapsedNodeIds = new Set();
+        state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack        = [];
+        state.treeHistory      = [];
+      });
+    },
+
+    deleteLibraryMachine: (id) => {
+      set((state) => {
+        const next = (state as unknown as AppState).savedMachines.filter((m) => m.id !== id);
+        (state as unknown as AppState).savedMachines = next;
+        persistLibrary(next);
       });
     },
 

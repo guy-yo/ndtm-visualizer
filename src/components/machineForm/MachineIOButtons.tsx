@@ -2,15 +2,16 @@ import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { saveMachine, loadMachineFromFile } from '../../utils/machineIO';
 import { copyShareUrl } from '../../utils/shareUrl';
+import { SaveBeforeNewModal } from './SaveBeforeNewModal';
 import styles from './MachineForm.module.css';
 
 export function MachineIOButtons() {
   const machine      = useAppStore((s) => s.machine);
   const inputString  = useAppStore((s) => s.inputString);
   const setMachine   = useAppStore((s) => s.setMachine);
-  const newMachine   = useAppStore((s) => s.newMachine);
   const fileRef      = React.useRef<HTMLInputElement>(null);
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied]   = React.useState(false);
+  const [showNewModal, setShowNewModal] = React.useState(false);
 
   async function handleLoad(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -35,15 +36,13 @@ export function MachineIOButtons() {
   }
 
   return (
+    <>
+    {showNewModal && <SaveBeforeNewModal onClose={() => setShowNewModal(false)} />}
     <div className={styles.ioButtons}>
       <button
         className={`${styles.ioBtn} ${styles.ioBtnNew}`}
-        onClick={() => {
-          if (confirm('Create a blank machine? This will clear the current machine (undoable with Ctrl+Z).')) {
-            newMachine();
-          }
-        }}
-        title="Start with a blank machine (qacc + qrej states)"
+        onClick={() => setShowNewModal(true)}
+        title="Start with a blank machine"
       >
         New
       </button>
@@ -76,5 +75,6 @@ export function MachineIOButtons() {
         onChange={handleLoad}
       />
     </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { useAppStore } from '../../store/useAppStore';
 import { StatesInput } from './StatesInput';
 import { ExamplesDropdown } from './ExamplesDropdown';
+import { MyMachinesDropdown } from './MyMachinesDropdown';
 import { MachineIOButtons } from './MachineIOButtons';
 import styles from './MachineForm.module.css';
 
@@ -27,6 +28,7 @@ export function MachineForm() {
         <h2 className={styles.title}>Machine Definition</h2>
         <div className={styles.headerActions}>
           <ExamplesDropdown />
+          <MyMachinesDropdown />
           <MachineIOButtons />
         </div>
       </div>
