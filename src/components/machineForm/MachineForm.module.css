@@ -132,6 +132,93 @@
   100% { opacity: 0; }
 }
 
+/* ── Save-to-library modal ───────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  padding: 22px 24px 18px;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.modalLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.modalInput {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-input-bg, var(--color-surface-2));
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text);
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modalInput:focus { border-color: var(--color-accent); }
+
+.modalActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.modalCancel {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 6px 14px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.modalCancel:hover { border-color: var(--color-text-muted); color: var(--color-text); }
+
+.modalSave {
+  background: var(--color-accent);
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 18px;
+  transition: opacity 0.15s;
+}
+.modalSave:hover:not(:disabled) { opacity: 0.85; }
+.modalSave:disabled { opacity: 0.4; cursor: default; }
+
 /* ── Collapsible form body ────────────────────────────────────────────── */
 .grid {
   display: flex;

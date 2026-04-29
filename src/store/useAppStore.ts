@@ -459,9 +459,20 @@ export const useAppStore = create<AppState>()(
       const entry = get().savedMachines.find((m) => m.id === id);
       if (!entry) return;
       const snap = snapshotMachine(get().machine);
+      // Deep-clone so immer never receives a reference shared with the library entry
+      const m = snapshotMachine(entry.machine);
       set((state) => {
-        Object.assign(state.machine, snapshotMachine(entry.machine));
-        state.machineErrors    = validateMachine(entry.machine);
+        // Explicit field-by-field assignment — Object.assign on an immer Draft
+        // can silently fail to propagate changes; this is guaranteed to work.
+        state.machine.states        = m.states;
+        state.machine.inputAlphabet = m.inputAlphabet;
+        state.machine.tapeAlphabet  = m.tapeAlphabet;
+        state.machine.startState    = m.startState;
+        state.machine.acceptStates  = m.acceptStates;
+        state.machine.rejectStates  = m.rejectStates;
+        state.machine.blankSymbol   = m.blankSymbol;
+        state.machine.transitions   = m.transitions;
+        state.machineErrors    = validateMachine(m);
         state.tree             = null;
         state.bfsQueue         = [];
         state.executionPhase   = 'idle';
@@ -469,7 +480,7 @@ export const useAppStore = create<AppState>()(
         state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
         state.redoStack        = [];
         state.treeHistory      = [];
-        (state as unknown as AppState).currentMachineId = id;
+        (state as any).currentMachineId = id;
       });
     },
 
