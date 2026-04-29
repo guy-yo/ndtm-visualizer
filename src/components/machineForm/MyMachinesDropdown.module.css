@@ -1,5 +1,7 @@
 .root {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .trigger {
@@ -9,8 +11,10 @@
   color: var(--color-text-muted);
   cursor: pointer;
   font-size: 11px;
-  padding: 3px 7px;
+  padding: 4px 7px;
   white-space: nowrap;
+  flex: 1;
+  text-align: left;
   transition: color 0.15s, border-color 0.15s;
 }
 .trigger:hover {

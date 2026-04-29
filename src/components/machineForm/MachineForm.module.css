@@ -1,24 +1,39 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
   gap: 8px;
 }
 
-/* Title + optional machine name stacked vertically */
-.titleBlock {
+/* ── Row 1: chevron + title + current machine name ───────────────────── */
+.titleRow {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chevronBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.chevronBtn:hover { color: var(--color-text); }
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 
 .currentMachineName {
@@ -28,24 +43,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 160px;
+  min-width: 0;
 }
 
-
-.headerActions {
+/* ── Rows 2 & 3: tool rows (dropdowns / IO buttons) ──────────────────── */
+.toolRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 /* Examples dropdown */
@@ -56,19 +62,20 @@
   color: var(--color-text-muted);
   cursor: pointer;
   font-size: 11px;
-  padding: 3px 6px;
-  max-width: 110px;
+  padding: 4px 7px;
+  flex: 1;
+  min-width: 100px;
   outline: none;
   transition: border-color 0.15s;
 }
-.examplesSelect:focus {
-  border-color: var(--color-accent);
-}
+.examplesSelect:focus { border-color: var(--color-accent); }
 
-/* Save / Load buttons */
+/* Save / Load / Undo / Redo buttons */
 .ioButtons {
   display: flex;
+  align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .ioBtn {
@@ -78,21 +85,28 @@
   color: var(--color-text-muted);
   cursor: pointer;
   font-size: 11px;
-  padding: 3px 7px;
+  padding: 4px 8px;
   transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
-
 .ioBtn:hover:not(:disabled) {
   color: var(--color-text);
   border-color: var(--color-accent);
 }
-
 .ioBtn:disabled {
   opacity: 0.3;
   cursor: default;
 }
 
-/* Thin vertical separator between undo/redo and the rest */
+.ioBtnNew {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.ioBtnNew:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Thin vertical separator between undo/redo and New/Save/… */
 .ioDivider {
   display: inline-block;
   width: 1px;
@@ -100,9 +114,10 @@
   background: var(--color-border);
   margin: 0 2px;
   align-self: center;
+  flex-shrink: 0;
 }
 
-/* "✓ Saved" flash indicator */
+/* "✓ Saved" flash */
 .savedFlash {
   font-size: 10px;
   font-weight: 600;
@@ -111,28 +126,21 @@
   white-space: nowrap;
   align-self: center;
 }
-
 @keyframes fadeOut {
   0%   { opacity: 1; }
   60%  { opacity: 1; }
   100% { opacity: 0; }
 }
 
-.ioBtnNew {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-.ioBtnNew:hover {
-  background: rgba(99, 102, 241, 0.1);
-}
-
+/* ── Collapsible form body ────────────────────────────────────────────── */
 .grid {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 4px;
 }
 
-/* Tape alphabet row: text input + fixed blank badge */
+/* Tape alphabet row: input + fixed blank badge */
 .tapeAlphabetField {
   display: flex;
   flex-direction: column;
@@ -161,7 +169,7 @@
   font-style: italic;
 }
 
-/* Constants section (start state, accept/reject states) */
+/* Constants panel */
 .constants {
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -211,4 +219,3 @@
   white-space: nowrap;
   user-select: text;
 }
-
