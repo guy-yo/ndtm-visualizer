@@ -440,30 +440,34 @@ export const useAppStore = create<AppState>()(
     },
 
     // ── Machine library ───────────────────────────────────────────────────────
+    // All three actions build the new library array OUTSIDE the immer set()
+    // callback (using get()), then pass plain values in — this avoids any
+    // Proxy-related serialisation issues that plague draft-internal mutations.
+
     saveMachineAs: (name) => {
-      const id = uuidv4();
-      const entry: SavedMachine = {
+      const id         = uuidv4();
+      const newEntry: SavedMachine = {
         id,
         name:    name.trim(),
         machine: snapshotMachine(get().machine),
         savedAt: Date.now(),
       };
+      const newLib = [newEntry, ...get().savedMachines];
+      persistLibrary(newLib);
       set((state) => {
-        (state as unknown as AppState).savedMachines    = [entry, ...(state as unknown as AppState).savedMachines];
-        (state as unknown as AppState).currentMachineId = id;
-        persistLibrary((state as unknown as AppState).savedMachines);
+        (state as any).savedMachines    = newLib;
+        (state as any).currentMachineId = id;
       });
     },
 
     loadLibraryMachine: (id) => {
       const entry = get().savedMachines.find((m) => m.id === id);
       if (!entry) return;
+      // Clone outside the draft so immer never wraps the returned values in a proxy
+      const m    = snapshotMachine(entry.machine);
       const snap = snapshotMachine(get().machine);
-      // Deep-clone so immer never receives a reference shared with the library entry
-      const m = snapshotMachine(entry.machine);
       set((state) => {
-        // Explicit field-by-field assignment — Object.assign on an immer Draft
-        // can silently fail to propagate changes; this is guaranteed to work.
+        // Replace every field individually — the safest pattern with immer
         state.machine.states        = m.states;
         state.machine.inputAlphabet = m.inputAlphabet;
         state.machine.tapeAlphabet  = m.tapeAlphabet;
@@ -472,26 +476,25 @@ export const useAppStore = create<AppState>()(
         state.machine.rejectStates  = m.rejectStates;
         state.machine.blankSymbol   = m.blankSymbol;
         state.machine.transitions   = m.transitions;
-        state.machineErrors    = validateMachine(m);
-        state.tree             = null;
-        state.bfsQueue         = [];
-        state.executionPhase   = 'idle';
-        state.collapsedNodeIds = new Set();
-        state.undoStack        = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
-        state.redoStack        = [];
-        state.treeHistory      = [];
+        state.machineErrors         = validateMachine(m);
+        state.tree                  = null;
+        state.bfsQueue              = [];
+        state.executionPhase        = 'idle';
+        state.collapsedNodeIds      = new Set();
+        state.undoStack             = [...state.undoStack.slice(-49), snap] as NTMDefinition[];
+        state.redoStack             = [];
+        state.treeHistory           = [];
         (state as any).currentMachineId = id;
       });
     },
 
     deleteLibraryMachine: (id) => {
+      const newLib = get().savedMachines.filter((m) => m.id !== id);
+      const wasActive = get().currentMachineId === id;
+      persistLibrary(newLib);
       set((state) => {
-        const next = (state as unknown as AppState).savedMachines.filter((m) => m.id !== id);
-        (state as unknown as AppState).savedMachines = next;
-        if ((state as unknown as AppState).currentMachineId === id) {
-          (state as unknown as AppState).currentMachineId = null;
-        }
-        persistLibrary(next);
+        (state as any).savedMachines = newLib;
+        if (wasActive) (state as any).currentMachineId = null;
       });
     },
 
@@ -762,17 +765,18 @@ useAppStore.subscribe((state, prev) => {
   // 1. Always persist the current working machine
   try { localStorage.setItem(LS_KEY, JSON.stringify(state.machine)); } catch { /* ignore */ }
 
-  // 2. If a named library entry is active, update it in-place
+  // 2. If a named library entry is active, update it in-place.
+  //    Read savedMachines via getState() to get the plain (non-proxy) array.
   const id = state.currentMachineId;
   if (!id) return;
 
-  const updated = state.savedMachines.map((m) =>
+  const currentLib = useAppStore.getState().savedMachines;
+  const updated = currentLib.map((m) =>
     m.id === id
       ? { ...m, machine: JSON.parse(JSON.stringify(state.machine)), savedAt: Date.now() }
       : m,
   );
 
   persistLibrary(updated);
-  // Update store without touching `machine` (prevents infinite loop)
   useAppStore.setState({ savedMachines: updated });
 });

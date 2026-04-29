@@ -11,6 +11,7 @@ import {
   type Edge,
   type Node,
   type NodeChange,
+  type OnConnectStartParams,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useAppStore } from '../../store/useAppStore';
@@ -66,6 +67,9 @@ export function StateDiagram() {
   // Ref to screenToFlowPosition — populated by FlowPositionHelper (inside ReactFlow provider)
   const converterRef = React.useRef<((p: XYPos) => XYPos) | null>(null);
 
+  // Track which node the user started dragging from so we can enforce direction
+  const connectStartNodeRef = React.useRef<string | null>(null);
+
   // Local node state — gives ReactFlow full control during drag for smooth movement
   const [rfNodes, setRfNodes] = React.useState<Node[]>(computedNodes);
 
@@ -111,9 +115,23 @@ export function StateDiagram() {
     setPosition(node.id, node.position);
   }
 
-  // Block connections that originate from accept / reject states
+  // Record the node the user starts dragging from
+  function handleConnectStart(_: React.MouseEvent, params: OnConnectStartParams) {
+    connectStartNodeRef.current = params.nodeId ?? null;
+  }
+
+  // Build the pending connection, always in drag-start → drop direction.
+  // ReactFlow with ConnectionMode.Loose can reverse source/target when the
+  // user drags from a "target"-typed handle; we detect and fix that here.
   function handleConnect(connection: Connection) {
-    const { source, target } = connection;
+    let { source, target } = connection;
+
+    // If ReactFlow swapped the direction, restore it
+    const startNode = connectStartNodeRef.current;
+    if (startNode && source !== startNode) {
+      [source, target] = [target, source];
+    }
+
     const acceptSet = new Set(machine.acceptStates);
     const rejectSet = new Set(machine.rejectStates);
     if (source && (acceptSet.has(source) || rejectSet.has(source))) return;
@@ -298,6 +316,7 @@ export function StateDiagram() {
         connectionMode={ConnectionMode.Loose}
         onNodesChange={handleNodesChange}
         onNodeDragStop={handleNodeDragStop}
+        onConnectStart={handleConnectStart}
         onConnect={handleConnect}
         onEdgeClick={handleEdgeClick}
         onPaneContextMenu={handlePaneContextMenu}
